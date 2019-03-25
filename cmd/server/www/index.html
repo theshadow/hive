@@ -1,0 +1,34 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Example WASM application</title>
+    <script src="wasm_exec.js"></script>
+    <script>
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("game.wasm"), go.importObject).then((result) => {
+            go.run(result.instance);
+        });
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+        }
+
+        #background-canvas {
+            position: fixed;
+            opacity:  0.9;
+            width:    100%;
+            height:   100%;
+            top:      0;
+            right:    0;
+            bottom:   0;
+            left:     0;
+        }
+
+        #background-image, #sprite-image {
+            display: none;
+        }
+    </style>
+</head>
+<body><img id="background-image" src="background.jpg" /><img id="sprite-image" src="coin-sprite-animation.png" /><canvas id="background-canvas" width="100%" height="100%"></canvas></body>
+</html>
