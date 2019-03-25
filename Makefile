@@ -11,7 +11,6 @@ clean:
 	rm -rf build/
 
 hive: build/hive/ hive-server hive-game
-	cd hive/ && cp start.sh ../build/hive/ \
 
 build/hive/:
 	mkdir -p build/hive/
