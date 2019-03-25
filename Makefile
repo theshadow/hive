@@ -12,16 +12,15 @@ clean:
 
 hive: build/hive/ hive-server hive-game
 	cd hive/ && cp start.sh ../build/hive/ \
-	&& cp LICENSE ../build/hive/ \
-	&& cp README.org ../build/hive/
 
 build/hive/:
 	mkdir -p build/hive/
 
 hive-server:
 	cd cmd/server/ && GO111MODULE=on $(GO) build -ldflags="-s -w" -i -o server ./... \
-	&& cp server ../../build/hive/ \
-	&& cp -r www ../../build/hive/
+	&& mv server ../../build/hive/ \
+	&& cp -r www ../../build/hive/ \
+	&& cp start.sh ../../build/hive/
 
 hive-game:
 	cd cmd/game/ && GOOS=js GOARCH=wasm GO111MODULE=on $(GO) build -ldflags="-s -w" -i -o ../../build/hive/www/game.wasm

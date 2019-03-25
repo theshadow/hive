@@ -1,3 +1,6 @@
+github.com/lucasb-eyer/go-colorful v0.0.0-20181028223441-12d3b2882a08/go.mod h1:NXg0ArsFk0Y01623LgUqoqcouGDB+PwCCQlrwrG6xJ4=
 github.com/lucasb-eyer/go-colorful v1.0.1 h1:nKJRBvZWPzvkwB4sY8A3U4zgqLf2Y9c02yzPsbXu/5c=
 github.com/lucasb-eyer/go-colorful v1.0.1/go.mod h1:tLy1nWSoU0DGtxQyNRrUmb6PUiB7usbds6gd97XTXwA=
+github.com/theshadow/sge v1.1.0-alpha h1:/enajUUR30C9hRedXWwzV5FfS8SSMMXpm49OktSli80=
+github.com/theshadow/sge v1.1.0-alpha/go.mod h1:LwBGqxGaIc6C+xrfxAlGw5boti5QT37/HO4BmkWGfK0=
 gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0/go.mod h1:OdE7CF6DbADk7lN8LIKRzRJTTZXIjtWgA5THM5lhBAw=
