@@ -1,10 +1,8 @@
 package main
 
 import (
-	"math"
+	"github.com/theshadow/hive"
 	"syscall/js"
-
-	"github.com/lucasb-eyer/go-colorful"
 
 	. "github.com/theshadow/sge"
 )
@@ -29,9 +27,16 @@ func main() {
 
 	ctx := canvasEl.Call("getContext", "2d")
 
+	center := Point2D{
+		width/2,
+		height/2,
+	}
+
+	debugLabel.SetTextf("Center %#v", center)
+
 	vp := NewViewPort(
 		[]GraphObject{
-			NewHexagon(HexagonFlatTop, Point2D{100, 100}, 25, colorful.FastHappyColor()),
+			hive.NewHexGrid(5, 5, center),
 			fpsLabel,
 			debugLabel,
 		},
@@ -85,20 +90,3 @@ func main() {
 	<-done
 }
 
-type AxialPoint2D [2]float64
-
-func (p AxialPoint2D) Q() float64 {
-	return p[0]
-}
-func (p AxialPoint2D) R() float64 {
-	return p[1]
-}
-
-// hexToPixel accepts the coordinates of a hex in axial and the size and converts it into a pixel
-// location
-func hexToPixel(pt AxialPoint2D, size float64) Point2D {
-	return Point2D{
-		size * 3./2 * pt.R(),
-		size * (math.Sqrt(3) * pt.Q() + math.Sqrt(3)/2 * pt.R()),
-	}
-}

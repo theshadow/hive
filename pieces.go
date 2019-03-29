@@ -48,7 +48,3 @@ func NewPiece(loc Point3D, o sge.GraphObject, t PieceType) *Piece {
 		typ: t,
 	}
 }
-
-type Grid struct {
-	pieces []Piece
-}
