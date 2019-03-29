@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"syscall/js"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -26,47 +27,11 @@ func main() {
 	canvasEl.Set("width", width)
 	canvasEl.Set("height", height)
 
-	background := doc.Call("getElementById", "background-image")
-	sprite := doc.Call("getElementById", "sprite-image")
-
 	ctx := canvasEl.Call("getContext", "2d")
 
 	vp := NewViewPort(
 		[]GraphObject{
-			NewImage(ImageCtx(background), Point2D{0, 0}),
-			NewSegmentFollower(
-				NewEmitter(15, 50, Point2D{100, 100}, 5, 1, 5, 3),
-				.10, LineSegment{Point2D{100, 100}, Point2D{100, 500}}),
-			NewSegmentFollower(
-				NewHexagon(HexagonPointyTop, Point2D{200, 100}, 25, colorful.FastHappyColor()),
-				.10, LineSegment{Point2D{200, 100}, Point2D{200, 500}}),
-			NewSegmentFollower(
-				NewDebuggedObject(NewPolygon(colorful.FastWarmColor(),
-					Point2D{300, 100}, Point2D{400, 200},
-					Point2D{400, 300}, Point2D{200, 200}),
-					debugLabel,
-					func (o GraphObject, l *Label) {
-						vec := o.(*Polygon).Vector()
-						l.SetTextf("Pos: {%.3f, %.3f} Vec: [0]{%.3f, %.3f} [1]{%.3f, %.3f} [2]{%.3f, %.3f} [3]{%.3f, %.3f}",
-							o.Pos().X(), o.Pos().Y(), vec[0].X(), vec[0].Y(), vec[1].X(),
-							vec[1].Y(), vec[2].X(), vec[2].Y(), vec[3].X(), vec[3].Y())
-					}),
-				.10, LineSegment{Point2D{300, 100}, Point2D{300, 500}}),
-			NewSegmentFollower(
-				NewTriangle(Point2D{400, 100}, Point2D{500, 200}, Point2D{300, 200}, colorful.FastHappyColor()),
-				.10, LineSegment{Point2D{400, 100}, Point2D{400, 500}}),
-			NewSegmentFollower(
-				NewRectangle(Point2D{500, 100}, 10, 10, true),
-				.10, LineSegment{Point2D{500, 100}, Point2D{500, 500}}),
-			NewSegmentFollower(
-				NewRectangle(Point2D{600, 100}, 10, 10, false),
-				.10, LineSegment{Point2D{600, 100}, Point2D{600, 500}}),
-			NewSegmentFollower(
-				NewCircle(Point2D{700, 100}, colorful.FastHappyColor(), float64(25), float64(.5)),
-				.10, LineSegment{Point2D{700, 100}, Point2D{700, 500}}),
-			NewSegmentFollower(
-				NewSprite(ImageCtx(sprite), Point2D{800, 100}, 1000, 100, 10),
-				.10, LineSegment{Point2D{800, 100}, Point2D{800, 500}}),
+			NewHexagon(HexagonFlatTop, Point2D{100, 100}, 25, colorful.FastHappyColor()),
 			fpsLabel,
 			debugLabel,
 		},
@@ -118,4 +83,22 @@ func main() {
 	js.Global().Call("requestAnimationFrame", renderFrame)
 
 	<-done
+}
+
+type AxialPoint2D [2]float64
+
+func (p AxialPoint2D) Q() float64 {
+	return p[0]
+}
+func (p AxialPoint2D) R() float64 {
+	return p[1]
+}
+
+// hexToPixel accepts the coordinates of a hex in axial and the size and converts it into a pixel
+// location
+func hexToPixel(pt AxialPoint2D, size float64) Point2D {
+	return Point2D{
+		size * 3./2 * pt.R(),
+		size * (math.Sqrt(3) * pt.Q() + math.Sqrt(3)/2 * pt.R()),
+	}
 }
