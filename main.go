@@ -1,0 +1,5 @@
+package hived
+
+func main() {
+
+}
