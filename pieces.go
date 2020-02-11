@@ -57,7 +57,7 @@ func (p Piece) Bug() uint8 {
 	return uint8(uint32(p)&BugMask>>16)
 }
 func (p Piece) BugS() string {
-	return bugLabels[p.Bug()]
+	return bugLabels[p.Bug()-1]
 }
 func (p Piece) IsPieceA() bool {
 	return p.Piece() == PieceA

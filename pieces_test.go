@@ -78,7 +78,7 @@ func TestPiece_Bug(t *testing.T) {
 			t.Logf("Bug didn't return %d", i)
 			t.Fail()
 		}
-		if p.BugS() != bugLabels[i] {
+		if p.BugS() != bugLabels[i-1] {
 			t.Logf("BugS didn't return %s", bugLabels[i])
 		}
 	}
