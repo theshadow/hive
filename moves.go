@@ -33,8 +33,8 @@ func (m Move) Src() Coordinate {
 func (m Move) Dst() Coordinate {
 	return Coordinate(m.transition & DstMask)
 }
-func (m Move) WasAdded() bool {
-	return m.Action() == Added
+func (m Move) WasPlaced() bool {
+	return m.Action() == Placed
 }
 func (m Move) WasMoved() bool {
 	return m.Action() == Moved
@@ -50,7 +50,7 @@ func (m Move) String() string {
 }
 
 const (
-	Added uint8 = iota
+	Placed uint8 = iota
 	Moved
 
 	ActionMask     = 0b11111111000000000000000000000000
@@ -58,6 +58,6 @@ const (
 )
 
 var actionLabels = []string{
-	"Added",
+	"Placed",
 	"Moved",
 }
