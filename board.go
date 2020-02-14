@@ -2,6 +2,51 @@ package hived
 
 import "fmt"
 
+// Board represents a 4D hex grid (x, y, z, height). It works by storing
+// the contents of a hex coordinate ("cell") in a slice and using a map
+// to quickly reference the memory.
+type Board struct {
+	// used to quickly look up the piece in the cells
+	locationMap map[Coordinate]int
+
+	// maintains the state of the pieces
+	cells []cell
+}
+
+func NewBoard() *Board {
+	return &Board{
+		locationMap: make(map[Coordinate]int),
+		cells:       []cell{},
+	}
+}
+func (brd *Board) Place(p Piece, c Coordinate) {
+	cl := cell{p, c}
+	brd.cells = append(brd.cells, cl)
+	brd.locationMap[cl.Coordinate] = len(brd.cells) - 1
+}
+func (brd *Board) Move(a, b Coordinate) error {
+	if idx, ok := brd.locationMap[a]; ok {
+		// update the coordinate of the piece
+		brd.cells[idx].Coordinate = b
+		brd.locationMap[b] = idx
+		delete(brd.locationMap, a)
+		return nil
+	}
+	return ErrInvalidCoordinate
+}
+func (brd *Board) Cell(c Coordinate) (Piece, bool) {
+	if idx, ok := brd.locationMap[c]; ok {
+		return brd.cells[idx].Piece, true
+	}
+	return Piece(0), false
+}
+
+func (brd *Board) Pieces() []cell {
+	return brd.cells
+}
+
+var ErrInvalidCoordinate = fmt.Errorf("the specified coordinate is invalid")
+
 /*
       X        Y        Z       H
   11111111|11111111|11111111|11111111
@@ -42,30 +87,9 @@ const (
 	HMask = 0b00000000000000000000000011111111
 )
 
-type PlacedPiece struct {
+// Represents a single cell of the hex grid. It's an internal type and shouldn't
+// be used elsewhere beyond the Board type
+type cell struct {
 	Piece      Piece
 	Coordinate Coordinate
 }
-
-type Board struct {
-	// used to quickly move pieces around in the pieces array.
-	locationMap map[Coordinate]int
-
-	// used for rendering the board by allowing the rendering engine to loop over all of the pieces
-	pieces []PlacedPiece
-}
-
-func (brd Board) Place(pp PlacedPiece) {
-	brd.pieces = append(brd.pieces, pp)
-	brd.locationMap[pp.Coordinate] = len(brd.pieces) - 1
-}
-func (brd Board) Move(a, b Coordinate) {
-	if idx, ok := brd.locationMap[a]; ok {
-		brd.pieces[idx].Coordinate = b
-		delete(brd.locationMap, a)
-	}
-}
-func (brd Board) Pieces() []PlacedPiece {
-	return brd.pieces
-}
-

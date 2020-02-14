@@ -73,7 +73,7 @@ func TestMove_Piece(t *testing.T) {
 
 	if m.Piece() != pExpected {
 		t.Logf("Expected: %32b (%d), Actual: %32b (%d)", pExpected, pExpected, m.Piece(), m.Piece())
-		t.Logf("Piece didn't return the expected piece")
+		t.Logf("Cell didn't return the expected piece")
 		t.Fail()
 	}
 }

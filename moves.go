@@ -3,7 +3,7 @@ package hived
 import "fmt"
 
 /*
-    Action |          Piece
+    Action |          Cell
    11111111|11111111|11111111|11111111
 
             Source Coordinate         |          Dst Coordinate
@@ -46,7 +46,7 @@ func (m Move) ActionS() string {
 	return actionLabels[m.Action()]
 }
 func (m Move) String() string {
-	return fmt.Sprintf("Action: %s, Piece: %s, Src: %s, Dst: %s", m.ActionS(), m.Piece(),  m.Src(), m.Dst())
+	return fmt.Sprintf("Action: %s, Cell: %s, Src: %s, Dst: %s", m.ActionS(), m.Piece(),  m.Src(), m.Dst())
 }
 
 const (

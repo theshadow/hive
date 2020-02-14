@@ -3,7 +3,7 @@ package hived
 import "fmt"
 
 /*
-    Color |  Bug   | Piece  | Unused
+    Color |  Bug   | Cell  | Unused
   11111111|11111111|11111111|11111111
 */
 type Piece uint32
@@ -57,7 +57,7 @@ func (p Piece) Bug() uint8 {
 	return uint8(uint32(p)&BugMask>>16)
 }
 func (p Piece) BugS() string {
-	return bugLabels[p.Bug()-1]
+	return bugLabels[p.Bug()]
 }
 func (p Piece) IsPieceA() bool {
 	return p.Piece() == PieceA
@@ -75,11 +75,11 @@ func (p Piece) PieceS() string {
 	return pieceLabels[p.Piece()]
 }
 func (p Piece) String() string {
-	return fmt.Sprintf("Color: %s, Bug: %s, Piece: %s", p.ColorS(), p.BugS(), p.PieceS())
+	return fmt.Sprintf("Color: %s, Bug: %s, Cell: %s", p.ColorS(), p.BugS(), p.PieceS())
 }
 
 const (
-	NoPiece uint8 = iota
+	NoBug uint8 = iota
 	Queen
 	Beetle
 	Grasshopper
@@ -91,30 +91,37 @@ const (
 
 	BugMask = 0b0000000011111110000000000000000
 
-	PieceA uint8 = 0
-	PieceB = 1
-	PieceC = 2
+	NoPiece uint8 = 0
+	PieceA = 1
+	PieceB = 2
+	PieceC = 3
 
 	PieceMask = 0b00000000000000001111111100000000
 
-	BlackColor uint8 = 0
-	WhiteColor = 1
+	NoColor uint8 = 0
+	BlackColor = 1
+	WhiteColor = 2
 
 	ColorMask = 0b1111111000000000000000000000000
 )
 
+var ZeroPiece = Piece(0)
+
 var pieceLabels = []string{
-	"Piece A",
-	"Piece B",
-	"Piece C",
+	"No Cell",
+	"Cell A",
+	"Cell B",
+	"Cell C",
 }
 
 var colorLabels = []string{
+	"No Color",
 	"Black",
 	"White",
 }
 
 var bugLabels = []string{
+	"No Bug",
 	"Queen",
 	"Beetle",
 	"Grasshopper",

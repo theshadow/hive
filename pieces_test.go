@@ -20,7 +20,7 @@ func TestPiece_Set(t *testing.T) {
 func TestPiece_Color(t *testing.T) {
 	p := Piece(uint32(BlackColor) << 24)
 	t.Logf("Binary - %32b", p)
-	t.Logf("Piece - %s", p)
+	t.Logf("Cell - %s", p)
 
 	if p.Color() != BlackColor {
 		t.Log("Color didn't return black")
@@ -34,7 +34,7 @@ func TestPiece_Color(t *testing.T) {
 
 	p = Piece(uint32(WhiteColor) << 24)
 	t.Logf("Binary - %32b", p)
-	t.Logf("Piece - %s", p)
+	t.Logf("Cell - %s", p)
 
 	if p.Color() != WhiteColor {
 		t.Log("Color didn't return white")
@@ -50,7 +50,7 @@ func TestPiece_Color(t *testing.T) {
 func TestPiece_ColorS(t *testing.T) {
 	p := Piece(uint32(BlackColor) << 24)
 	t.Logf("Binary - %32b", p)
-	t.Logf("Piece - %s", p)
+	t.Logf("Cell - %s", p)
 
 	if p.ColorS() != colorLabels[BlackColor] {
 		t.Log("ColorS didn't return black")
@@ -59,7 +59,7 @@ func TestPiece_ColorS(t *testing.T) {
 
 	p = Piece(uint32(WhiteColor) << 24)
 	t.Logf("Binary - %32b", p)
-	t.Logf("Piece - %s", p)
+	t.Logf("Cell - %s", p)
 
 	if p.ColorS() != colorLabels[WhiteColor] {
 		t.Log("ColorS didn't return white")
@@ -72,13 +72,13 @@ func TestPiece_Bug(t *testing.T) {
 		p := Piece(uint32(i) << 16)
 
 		t.Logf("Binary - %32b", p)
-		t.Logf("Piece - %s", p)
+		t.Logf("Cell - %s", p)
 
 		if p.Bug() != i {
 			t.Logf("Bug didn't return %d", i)
 			t.Fail()
 		}
-		if p.BugS() != bugLabels[i-1] {
+		if p.BugS() != bugLabels[i] {
 			t.Logf("BugS didn't return %s", bugLabels[i])
 		}
 	}
@@ -89,14 +89,14 @@ func TestPiece_Piece(t *testing.T) {
 		p := Piece(uint32(i) << 8)
 
 		t.Logf("Binary - %32b", p)
-		t.Logf("Piece - %s", p)
+		t.Logf("Cell - %s", p)
 
-		if p.Piece() != i {
-			t.Logf("Piece didn't return %d", i)
+		if int(p.Piece()) != i {
+			t.Logf("Cell didn't return %d", i)
 			t.Fail()
 		}
 		if p.PieceS() != pieceLabels[i] {
-			t.Logf("Piece didn't return %s, returned %s", pieceLabels[i], p.PieceS())
+			t.Logf("Cell didn't return %s, returned %s", pieceLabels[i], p.PieceS())
 			t.Fail()
 		}
 	}
