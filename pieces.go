@@ -7,6 +7,7 @@ import "fmt"
   11111111|11111111|11111111|11111111
 */
 type Piece uint32
+
 func NewPiece(color, bug, piece uint8) Piece {
 	var p Piece
 	(&p).Set(color, bug, piece)
@@ -24,7 +25,7 @@ func (p Piece) IsBlack() bool {
 	return p.Color() == BlackColor
 }
 func (p Piece) Color() uint8 {
-	return uint8(uint32(p)&ColorMask>>24)
+	return uint8(uint32(p) & ColorMask >> 24)
 }
 func (p Piece) ColorS() string {
 	return colorLabels[p.Color()]
@@ -54,7 +55,7 @@ func (p Piece) IsPillBug() bool {
 	return p.Bug() == PillBug
 }
 func (p Piece) Bug() uint8 {
-	return uint8(uint32(p)&BugMask>>16)
+	return uint8(uint32(p) & BugMask >> 16)
 }
 func (p Piece) BugS() string {
 	return bugLabels[p.Bug()]
@@ -92,15 +93,15 @@ const (
 	BugMask = 0b0000000011111110000000000000000
 
 	NoPiece uint8 = 0
-	PieceA = 1
-	PieceB = 2
-	PieceC = 3
+	PieceA        = 1
+	PieceB        = 2
+	PieceC        = 3
 
 	PieceMask = 0b00000000000000001111111100000000
 
-	NoColor uint8 = 0
-	BlackColor = 1
-	WhiteColor = 2
+	NoColor    uint8 = 0
+	BlackColor       = 1
+	WhiteColor       = 2
 
 	ColorMask = 0b1111111000000000000000000000000
 )

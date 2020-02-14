@@ -37,10 +37,10 @@ func TestMove_Set(t *testing.T) {
 
 func TestMove_Action(t *testing.T) {
 	m := NewMove(
-			Moved,
-			NewPiece(WhiteColor, Beetle, PieceA),
-			NewCoordinate(2, 3, 4, 5),
-			NewCoordinate(6, 7, 8 , 9))
+		Moved,
+		NewPiece(WhiteColor, Beetle, PieceA),
+		NewCoordinate(2, 3, 4, 5),
+		NewCoordinate(6, 7, 8, 9))
 
 	if m.Action() != Moved {
 		t.Logf("Expected: %32b (%d), Actual: %32b (%d)", Moved, Moved, m.Action(), m.Action())
@@ -54,7 +54,7 @@ func TestMove_ActionS(t *testing.T) {
 		Moved,
 		NewPiece(WhiteColor, Beetle, PieceA),
 		NewCoordinate(2, 3, 4, 5),
-		NewCoordinate(6, 7, 8 , 9))
+		NewCoordinate(6, 7, 8, 9))
 
 	if m.ActionS() != actionLabels[Moved] {
 		t.Logf("Expected: %s, Actual: %s", actionLabels[Moved], m.ActionS())
@@ -69,7 +69,7 @@ func TestMove_Piece(t *testing.T) {
 		Moved,
 		NewPiece(WhiteColor, Beetle, PieceA),
 		NewCoordinate(2, 3, 4, 5),
-		NewCoordinate(6, 7, 8 , 9))
+		NewCoordinate(6, 7, 8, 9))
 
 	if m.Piece() != pExpected {
 		t.Logf("Expected: %32b (%d), Actual: %32b (%d)", pExpected, pExpected, m.Piece(), m.Piece())
@@ -84,7 +84,7 @@ func TestMove_Src(t *testing.T) {
 		Moved,
 		NewPiece(WhiteColor, Beetle, PieceA),
 		NewCoordinate(2, 3, 4, 5),
-		NewCoordinate(6, 7, 8 , 9))
+		NewCoordinate(6, 7, 8, 9))
 
 	if m.Src() != expected {
 		t.Logf("Expected: %s, Actual: %s", expected, m.Src())
@@ -94,12 +94,12 @@ func TestMove_Src(t *testing.T) {
 }
 
 func TestMove_Dst(t *testing.T) {
-	expected := NewCoordinate(6, 7, 8 , 9)
+	expected := NewCoordinate(6, 7, 8, 9)
 	m := NewMove(
 		Moved,
 		NewPiece(WhiteColor, Beetle, PieceA),
 		NewCoordinate(2, 3, 4, 5),
-		NewCoordinate(6, 7, 8 , 9))
+		NewCoordinate(6, 7, 8, 9))
 
 	if m.Dst() != expected {
 		t.Logf("Expected: %s, Actual: %s", expected, m.Src())

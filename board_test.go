@@ -3,7 +3,7 @@ package hived
 import "testing"
 
 func TestCoordinate_Set(t *testing.T) {
-	cActual := NewCoordinate(1,2, 3, 4)
+	cActual := NewCoordinate(1, 2, 3, 4)
 
 	var cExpected Coordinate
 	cExpected |= Coordinate(int32(1) << 24)
@@ -18,7 +18,7 @@ func TestCoordinate_Set(t *testing.T) {
 }
 
 func TestCoordinate_Parts(t *testing.T) {
-	c := NewCoordinate(1,2, 3, 4)
+	c := NewCoordinate(1, 2, 3, 4)
 
 	if c.X() != 1 {
 		t.Logf("X didn't return the expected value")
@@ -45,15 +45,15 @@ func TestBoard_Place(t *testing.T) {
 	board := NewBoard()
 
 	pieceA := NewPiece(WhiteColor, Grasshopper, PieceA)
-	cPieceA := NewCoordinate(0, 0,0, 0)
+	cPieceA := NewCoordinate(0, 0, 0, 0)
 	board.Place(pieceA, cPieceA)
 
 	pieceB := NewPiece(BlackColor, Grasshopper, PieceA)
-	cPieceB := NewCoordinate(1, 1,1, 0)
+	cPieceB := NewCoordinate(1, 1, 1, 0)
 	board.Place(pieceB, cPieceB)
 
 	pieceC := NewPiece(WhiteColor, Queen, PieceA)
-	cPieceC := NewCoordinate(2, 2,2, 0)
+	cPieceC := NewCoordinate(2, 2, 2, 0)
 	board.Place(pieceC, cPieceC)
 
 	if p, ok := board.Cell(cPieceA); !ok || p != pieceA {
@@ -79,7 +79,7 @@ func TestBoard_Move(t *testing.T) {
 	board := NewBoard()
 
 	p := NewPiece(WhiteColor, Grasshopper, PieceA)
-	cA := NewCoordinate(0, 0,0, 0)
+	cA := NewCoordinate(0, 0, 0, 0)
 	cB := NewCoordinate(1, 1, 1, 0)
 
 	board.Place(p, cA)

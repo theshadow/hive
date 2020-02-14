@@ -13,6 +13,7 @@ type Move struct {
 	action     uint32
 	transition uint64
 }
+
 func NewMove(action uint8, p Piece, src Coordinate, dst Coordinate) Move {
 	var m Move
 	(&m).Set(action, p, src, dst)
@@ -46,15 +47,15 @@ func (m Move) ActionS() string {
 	return actionLabels[m.Action()]
 }
 func (m Move) String() string {
-	return fmt.Sprintf("Action: %s, Cell: %s, Src: %s, Dst: %s", m.ActionS(), m.Piece(),  m.Src(), m.Dst())
+	return fmt.Sprintf("Action: %s, Cell: %s, Src: %s, Dst: %s", m.ActionS(), m.Piece(), m.Src(), m.Dst())
 }
 
 const (
 	Placed uint8 = iota
 	Moved
 
-	ActionMask     = 0b11111111000000000000000000000000
-	DstMask        = 0b0000000000000000000000000000000011111111111111111111111111111111
+	ActionMask = 0b11111111000000000000000000000000
+	DstMask    = 0b0000000000000000000000000000000011111111111111111111111111111111
 )
 
 var actionLabels = []string{

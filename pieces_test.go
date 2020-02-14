@@ -68,7 +68,7 @@ func TestPiece_ColorS(t *testing.T) {
 }
 
 func TestPiece_Bug(t *testing.T) {
-	for i := Queen; i < PillBug + 1; i++ {
+	for i := Queen; i < PillBug+1; i++ {
 		p := Piece(uint32(i) << 16)
 
 		t.Logf("Binary - %32b", p)
@@ -85,7 +85,7 @@ func TestPiece_Bug(t *testing.T) {
 }
 
 func TestPiece_Piece(t *testing.T) {
-	for i := PieceA; i < PieceC + 1; i++ {
+	for i := PieceA; i < PieceC+1; i++ {
 		p := Piece(uint32(i) << 8)
 
 		t.Logf("Binary - %32b", p)

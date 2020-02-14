@@ -40,6 +40,23 @@ func (brd *Board) Cell(c Coordinate) (Piece, bool) {
 	}
 	return Piece(0), false
 }
+// TODO: Test this method
+func (brd *Board) Neighbors(c Coordinate) ([]Piece, error) {
+	if _, ok := brd.Cell(c); !ok {
+		return nil, ErrInvalidCoordinate
+	}
+
+	var neighbors []Piece
+
+	for _, loc := range neighborsCoordinates {
+		loc = c.Add(loc)
+		if p, ok := brd.Cell(loc); ok {
+			neighbors = append(neighbors, p)
+		}
+	}
+
+	return neighbors, nil
+}
 
 func (brd *Board) Pieces() []cell {
 	return brd.cells
@@ -47,11 +64,22 @@ func (brd *Board) Pieces() []cell {
 
 var ErrInvalidCoordinate = fmt.Errorf("the specified coordinate is invalid")
 
+var neighborsCoordinates = []Coordinate{
+	NewCoordinate(0, 1, -1, 0),
+	NewCoordinate(1, 0, -1, 0),
+	NewCoordinate(1, -1, 0, 0),
+	NewCoordinate(0, -1, 1, 0),
+	NewCoordinate(-1, 0, 1, 0),
+	NewCoordinate(-1, 1, 0, 0),
+	NewCoordinate(0, 0, 0, 1),
+}
+
 /*
       X        Y        Z       H
   11111111|11111111|11111111|11111111
 */
 type Coordinate uint32
+
 func NewCoordinate(x, y, z, h int8) Coordinate {
 	var c Coordinate
 	(&c).Set(x, y, z, h)
@@ -63,6 +91,9 @@ func (c *Coordinate) Set(x, y, z, h int8) {
 	*c |= Coordinate(int32(y) << 16)
 	*c |= Coordinate(int32(z) << 8)
 	*c |= Coordinate(int32(h) << 0)
+}
+func (c Coordinate) Add(loc Coordinate) Coordinate {
+	return NewCoordinate(c.X() + loc.X(), c.Y() + loc.Y(), c.Z() + loc.Z(), c.H() + loc.H())
 }
 func (c Coordinate) X() int8 {
 	return int8(uint32(c) & XMask >> 24)
