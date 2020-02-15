@@ -82,8 +82,8 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 	return nil
 }
 
+// TODO: Implement rules for movement
 func (g *Game) Move(a, b Coordinate) error {
-	// TODO: Implement game rules for movement
 	// Is this a valid piece to move?
 	piece, ok := g.board.Cell(a)
 	if !ok {
@@ -115,16 +115,44 @@ func (g *Game) Move(a, b Coordinate) error {
 	//     - Rule of sliding
 	//     - Paralyzed after Pill Bug action
 	//     no: ErrPieceMayNotMove
+	// TODO: Implement the rule of sliding
+	// If 5 sides have pieces it can't slide
+	// If 4 sides in a space ship or butterfly formation it can't slide
+	// If 3 sides in an uneven butterfly formation it can't slide
+
+
+
+	// if the piece is paralyzed the player can't move it
 	if g.pieceIsParalyzed(a) {
 		return ErrPieceMayNotMove
 	}
 
-	// TODO: implement breaking hive on move
 	// TODO: implement path validation
 	// Is this move valid?
 	//     - Breaking the hive
 	//     - Can this piece move to this location (pathing)
 	//     no: ErrInvalidMove
+
+	// TODO: implement splitting hive on move
+	// If it can slide, and there are four neighbors there is no split.
+	
+	// TODO: How does ladybug movement work?
+	// Probably a modified path algorithm where any cell with a piece within a distance of
+	// 2 from the ladybug is considered to have a height of zero?
+	// TODO: How does pill bug movement work? Could these be implemented as custom path rules?
+	// What if part of the pathing rules allowed the bug to modify the terrain? None of
+	// the pieces have height limits for their movement so we could create a terrain
+	// mask that made the pathing algorithm see those cells as empty. Thus a lady
+	// bug can path over pieces. That might work, I think there are some edge cases.
+	//
+	// If A is a piece touching a pillbug / (mosquito:pillbug) of the right color
+	// and A is not paralyzed, and the pillbug / (mosquito:pillbug) is not paralyzed,
+	// and B is an empty cell. Move A to B and return nil.
+
+	// TODO: How does mosquito movement work? This may be another custom Move function,
+	//       can I generalize?
+	// If A is a mosquito, calculate for each bug type adjacent if B is a valid point
+	// in that pieces path algorithm move the piece return nil
 
 	// Move the piece
 	if err := g.board.Move(a, b); err != nil {
@@ -161,11 +189,13 @@ func (g *Game) checkNeighbors(p Piece, c Coordinate) error {
 	if err != nil {
 		return err
 	}
-	if len(neighbors) == 0 {
-		// must be placed next to a piece
-		return ErrInvalidPlacement
-	}
+
 	for _, n := range neighbors {
+		// don't care about zero pieces
+		if n == ZeroPiece {
+			continue
+		}
+
 		// TODO: Are there any other rules about neighbors and placement???
 		if p.Color() != n.Color() {
 			// TODO: Log which piece is offending?

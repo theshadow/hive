@@ -1,0 +1,44 @@
+O = White player
+X = Black player
+
+* When white is surrounded with three pieces in the broken butterfly formation moving it may split the hive
+
+** White moving would not split the hive
+
+All pieces in contact with the moving piece can path to each other. There isn't a split.
+
+         _____         _____         _____
+        /     \       /     \       /     \
+  _____/       \_____/       \_____/       \_____
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/   X   \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/   X   \_____/   X   \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/   X   \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/   O   \_____/   X   \_____/
+ /     \       /     \       /  X  \       /     \
+/       \_____/       \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/       \_____/       \_____/
+
+** White moving would split the hive
+
+All pieces in contact with the moving piece can't path to each other. There is a split.
+
+         _____         _____         _____
+        /     \       /     \       /     \
+  _____/       \_____/       \_____/       \_____
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/   X   \_____/   X   \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/   X   \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/   O   \_____/   X   \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/   X   \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/       \_____/       \_____/

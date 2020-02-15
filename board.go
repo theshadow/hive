@@ -41,17 +41,19 @@ func (brd *Board) Cell(c Coordinate) (Piece, bool) {
 	return ZeroPiece, false
 }
 
-func (brd *Board) Neighbors(c Coordinate) ([]Piece, error) {
+func (brd *Board) Neighbors(c Coordinate) ([7]Piece, error) {
+	var neighbors [7]Piece
+
 	if _, ok := brd.Cell(c); !ok {
-		return nil, ErrInvalidCoordinate
+		return neighbors, ErrInvalidCoordinate
 	}
 
-	var neighbors []Piece
-
-	for _, loc := range neighborsMatrix {
+	for i, loc := range neighborsMatrix {
 		loc = c.Add(loc)
 		if p, ok := brd.Cell(loc); ok {
-			neighbors = append(neighbors, p)
+			neighbors[i] = p
+		} else {
+			neighbors[i] = ZeroPiece
 		}
 	}
 
@@ -65,58 +67,22 @@ func (brd *Board) Pieces() []cell {
 var ErrInvalidCoordinate = fmt.Errorf("the specified coordinate is invalid")
 
 var neighborsMatrix = []Coordinate{
+	// North
 	NewCoordinate(0, 1, -1, 0),
+	// Northeast
 	NewCoordinate(1, 0, -1, 0),
+	// Southeast
 	NewCoordinate(1, -1, 0, 0),
+	// South
 	NewCoordinate(0, -1, 1, 0),
+	// Southwest
 	NewCoordinate(-1, 0, 1, 0),
+	// Northwest
 	NewCoordinate(-1, 1, 0, 0),
+
+	// Above
 	NewCoordinate(0, 0, 0, 1),
 }
-
-/*
-      X        Y        Z       H
-  11111111|11111111|11111111|11111111
-*/
-type Coordinate uint32
-
-func NewCoordinate(x, y, z, h int8) Coordinate {
-	var c Coordinate
-	(&c).Set(x, y, z, h)
-
-	return c
-}
-func (c *Coordinate) Set(x, y, z, h int8) {
-	*c |= Coordinate(int32(x) << 24)
-	*c |= Coordinate(int32(y) << 16)
-	*c |= Coordinate(int32(z) << 8)
-	*c |= Coordinate(int32(h) << 0)
-}
-func (c Coordinate) Add(loc Coordinate) Coordinate {
-	return NewCoordinate(c.X()+loc.X(), c.Y()+loc.Y(), c.Z()+loc.Z(), c.H()+loc.H())
-}
-func (c Coordinate) X() int8 {
-	return int8(uint32(c) & XMask >> 24)
-}
-func (c Coordinate) Y() int8 {
-	return int8(uint32(c) & YMask >> 16)
-}
-func (c Coordinate) Z() int8 {
-	return int8(uint32(c) & ZMask >> 8)
-}
-func (c Coordinate) H() int8 {
-	return int8(uint32(c) & HMask >> 0)
-}
-func (c Coordinate) String() string {
-	return fmt.Sprintf("X: %d, Y: %d, Z: %d, H: %d", c.X(), c.Y(), c.Z(), c.H())
-}
-
-const (
-	XMask = 0b11111111000000000000000000000000
-	YMask = 0b00000000111111110000000000000000
-	ZMask = 0b00000000000000001111111100000000
-	HMask = 0b00000000000000000000000011111111
-)
 
 // Represents a single cell of the hex grid. It's an internal type and shouldn't
 // be used elsewhere beyond the Board type
@@ -124,3 +90,12 @@ type cell struct {
 	Piece      Piece
 	Coordinate Coordinate
 }
+
+const (
+	North = iota
+	NorthEast
+	SouthEast
+	South
+	Southwest
+	Northwest
+)
