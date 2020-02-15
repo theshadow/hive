@@ -41,6 +41,15 @@ func TestCoordinate_Parts(t *testing.T) {
 	}
 }
 
+func TestCoordinate_Add(t *testing.T) {
+	origin := NewCoordinate(0, 0, 0, 0)
+	location := origin.Add(NewCoordinate(-1, -2, -3, -4))
+	if location.X() != -1 || location.Y() == -2 || location.Z() == -3 || location.H() != -4 {
+		t.Logf("location doesn't match the expected location")
+		t.Fail()
+	}
+}
+
 func TestBoard_Place(t *testing.T) {
 	board := NewBoard()
 
@@ -96,5 +105,56 @@ func TestBoard_Move(t *testing.T) {
 	if _, ok := board.Cell(cB); !ok {
 		t.Logf("found no piece at the destination coordinate")
 		t.Fail()
+	}
+}
+
+// Test that Neighbors can return a piece on all sides
+//
+// Place a piece at origin and use the neighborsMatrix to place the pieces
+// on all sides of the origin piece.
+//
+// Use Neighbors() to retrieve the neighbors from origin and then validate
+// that the pieces match.
+//
+func TestBoard_Neighbors(t *testing.T) {
+	board := NewBoard()
+	origin := NewCoordinate(0, 0, 0, 0)
+
+	// origin piece
+	pWhiteGrasshopperA := NewPiece(WhiteColor, Grasshopper, PieceA)
+
+	// surrounding pieces
+	otherPieces := []Piece{
+		NewPiece(BlackColor, Grasshopper, PieceA),
+		NewPiece(BlackColor, Grasshopper, PieceA),
+		NewPiece(BlackColor, Ant, PieceA),
+		NewPiece(BlackColor, Ant, PieceB),
+		NewPiece(BlackColor, Beetle, PieceA),
+		NewPiece(BlackColor, Beetle, PieceB),
+		NewPiece(BlackColor, Ladybug, PieceA),
+	}
+
+	board.Place(pWhiteGrasshopperA, origin)
+
+	// use the neighbors matrix to place each piece manually
+	for idx, op := range otherPieces {
+		board.Place(op, origin.Add(neighborsMatrix[idx]))
+	}
+
+	// grab the neighbors and compare
+	if neighbors, err := board.Neighbors(origin); err != nil {
+		t.Log("unable to retrieve neighbors from origin")
+		t.Fail()
+	} else {
+		if len(neighbors) != 6 {
+			t.Logf("not all sides had a piece placed, missing %d", 6 - len(neighbors))
+		}
+
+		for i, neighbor := range neighbors {
+			if otherPieces[i] != neighbor {
+				t.Logf("expected piece %s at %d, found %s", otherPieces[i], i, neighbor)
+				t.Fail()
+			}
+		}
 	}
 }
