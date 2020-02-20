@@ -1,102 +1,137 @@
 package hived
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
-func TestPiece_Set(t *testing.T) {
-	var pExpected Piece
-	pExpected |= Piece(uint32(WhiteColor) << 24)
-	pExpected |= Piece(uint32(Beetle) << 16)
-	pExpected |= Piece(uint32(PieceC) << 8)
+func TestPlayer_HasZeroPieces(t *testing.T) {
+	var player Player
+	if !player.HasZeroPieces() {
+		t.Log("a zero-value player has pieces")
+		t.Fail()
+	}
 
-	var pActual Piece
-	(&pActual).Set(WhiteColor, Beetle, PieceC)
-
-	if pExpected != pActual {
-		t.Logf("the expected piece %s did not match the actual piece %s", pExpected, pActual)
+	player = NewPlayer()
+	if player.HasZeroPieces() {
+		t.Log(" a new player has zero pieces")
 		t.Fail()
 	}
 }
 
-func TestPiece_Color(t *testing.T) {
-	p := Piece(uint32(BlackColor) << 24)
-	t.Logf("Binary - %32b", p)
-	t.Logf("Cell - %s", p)
+func TestPlayer_Ants(t *testing.T) {
+	pOrig := NewPlayer()
 
-	if p.Color() != BlackColor {
-		t.Log("Color didn't return black")
+	if pOrig.Ants() != 3 {
+		t.Logf("Player: %16b Ants: %d", pOrig, pOrig.Ants())
+		t.Log("a new pOrig doesn't have 3 ants")
 		t.Fail()
 	}
 
-	if !p.IsBlack() {
-		t.Log("IsBlack didn't return true")
+	pNew, err := pOrig.TakeAnAnt()
+	if err != nil {
+		t.Logf("unable to take AntA: %s", err)
+		t.Fail()
+	} else if pNew.Ants() != 2 {
+		t.Logf("Before: %16b After: %16b Ants: %d", pOrig, pNew, pNew.Ants())
+		t.Log("after taking an ant from a new pOrig there wasn't two ants left")
 		t.Fail()
 	}
 
-	p = Piece(uint32(WhiteColor) << 24)
-	t.Logf("Binary - %32b", p)
-	t.Logf("Cell - %s", p)
-
-	if p.Color() != WhiteColor {
-		t.Log("Color didn't return white")
+	pOrig = pNew
+	pNew, err = pOrig.TakeAnAnt()
+	if err != nil {
+		t.Logf("unable to take AntB: %s", err)
+		t.Fail()
+	} else if pNew.Ants() != 1 {
+		t.Logf("Before: %16b After: %16b Ants: %d", pOrig, pNew, pNew.Ants())
+		t.Log("after taking an ant there wasn't one ant left")
 		t.Fail()
 	}
 
-	if !p.IsWhite() {
-		t.Log("IsWhite didn't return true")
+	pOrig = pNew
+	pNew, err = pOrig.TakeAnAnt()
+	if err != nil {
+		t.Logf("unable to take AntC: %s", err)
+		t.Fail()
+	} else if pNew.Ants() != 0 {
+		t.Logf("Before: %16b After: %16b Ants: %d", pOrig, pNew, pNew.Ants())
+		t.Log("after taking an ant there wasn't zero ants left")
+		t.Fail()
+	}
+
+	pOrig = pNew
+	pNew, err = pOrig.TakeAnAnt()
+	if err == nil {
+		t.Logf("Before: %16b After: %16b Ants: %d", pOrig, pNew, pNew.Ants())
+		t.Log("expected an error when trying to take an ant with zero remaining")
 		t.Fail()
 	}
 }
 
-func TestPiece_ColorS(t *testing.T) {
-	p := Piece(uint32(BlackColor) << 24)
-	t.Logf("Binary - %32b", p)
-	t.Logf("Cell - %s", p)
-
-	if p.ColorS() != colorLabels[BlackColor] {
-		t.Log("ColorS didn't return black")
-		t.Fail()
+func TestPlayer_Grasshoppers(t *testing.T) {
+	tests := []struct{
+		bug string
+		count int
+	}{
+		{ bug: "Ant", count: 3 },
+		{ bug: "Grasshopper", count: 3 },
+		{ bug: "Beetle", count: 2 },
+		{ bug: "Spider", count: 2 },
 	}
 
-	p = Piece(uint32(WhiteColor) << 24)
-	t.Logf("Binary - %32b", p)
-	t.Logf("Cell - %s", p)
-
-	if p.ColorS() != colorLabels[WhiteColor] {
-		t.Log("ColorS didn't return white")
-		t.Fail()
+	fnCount := func (p Player, bug string) int {
+		if bug == "Ant" {
+			return p.Ants()
+		} else if bug == "Grasshopper" {
+			return p.Grasshoppers()
+		} else if bug == "Beetle" {
+			return p.Beetles()
+		} else if bug == "Spider" {
+			return p.Spiders()
+		}
+		return 0
 	}
-}
 
-func TestPiece_Bug(t *testing.T) {
-	for i := Queen; i < PillBug+1; i++ {
-		p := Piece(uint32(i) << 16)
+	fnTake := func (p Player, bug string) (Player, error) {
+		if bug == "Ant" {
+			return p.TakeAnAnt()
+		} else if bug == "Grasshopper" {
+			return p.TakeAGrasshopper()
+		} else if bug == "Beetle" {
+			return p.TakeABeetle()
+		} else if bug == "Spider" {
+			return p.TakeASpider()
+		}
+		return ZeroPlayer, fmt.Errorf("undefined bug handler %s", bug)
+	}
 
-		t.Logf("Binary - %32b", p)
-		t.Logf("Cell - %s", p)
+	for _, test := range tests {
+		pOrig := NewPlayer()
 
-		if p.Bug() != i {
-			t.Logf("Bug didn't return %d", i)
+		if fnCount(pOrig, test.bug) != test.count {
+			t.Logf("Player: %16b %ss: %d", pOrig, test.bug, fnCount(pOrig, test.bug))
+			t.Logf("a new player doesn't have 3 %ss", test.bug)
 			t.Fail()
 		}
-		if p.BugS() != bugLabels[i] {
-			t.Logf("BugS didn't return %s", bugLabels[i])
+
+		for i := test.count; i > 0; i-- {
+			pNew, err := fnTake(pOrig, test.bug)
+			if err != nil {
+				t.Logf("unable to take %sA: %s", test.bug, err)
+				t.Fail()
+			} else if fnCount(pNew, test.bug) != i-1 {
+				t.Logf("Before: %16b After: %16b %s: %d", pOrig, pNew, test.bug, fnCount(pNew, test.bug))
+				t.Logf("after taking an %s from a player there wasn't %d %s(s) left", test.bug, i-1, test.bug)
+				t.Fail()
+			}
+			pOrig = pNew
 		}
-	}
-}
 
-func TestPiece_Piece(t *testing.T) {
-	for i := PieceA; i < PieceC+1; i++ {
-		p := Piece(uint32(i) << 8)
-
-		t.Logf("Binary - %32b", p)
-		t.Logf("Cell - %s", p)
-
-		if int(p.Piece()) != i {
-			t.Logf("Cell didn't return %d", i)
-			t.Fail()
-		}
-		if p.PieceS() != pieceLabels[i] {
-			t.Logf("Cell didn't return %s, returned %s", pieceLabels[i], p.PieceS())
+		_, err := fnTake(pOrig, test.bug)
+		if err == nil {
+			t.Logf("Before: %16b %s: %d", pOrig, test.bug, fnCount(pOrig, test.bug))
+			t.Logf("expected an error when trying to take an %s with zero remaining", test.bug)
 			t.Fail()
 		}
 	}

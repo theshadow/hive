@@ -19,7 +19,12 @@ import "fmt"
 	1111|1111|1111|1111
 */
 type Player uint16
-
+func NewPlayer() (p Player) {
+	// flip everything on and shift off the
+	// unused bit just to be consistent and tidy.
+	p = ^Player(0)
+	return p
+}
 func (p Player) HasZeroPieces() bool {
 	return (p << 2) == 0
 }
@@ -35,7 +40,7 @@ func (p Player) HasQueen() bool {
 
 // Will return 3 or less for the count as there are only three ants per currentPlayer
 func (p Player) Ants() (count int) {
-	n := int((p & AntsMask) >> 11)
+	n := int((p & AntsMask) >> 9)
 	for n > 0 {
 		count += n & 1
 		n >>= 1
@@ -96,40 +101,40 @@ func (p Player) TakeQueen() (Player, error) {
 }
 func (p Player) TakeAnAnt() (Player, error) {
 	if p.Ants() == 3 {
-		return p | AntABitMask, nil
+		return p &^ AntABitMask, nil
 	} else if p.Ants() == 2 {
-		return p | AntBBitMask, nil
+		return p &^ AntBBitMask, nil
 	} else if p.Ants() == 1 {
-		return p | AntCBitMask, nil
+		return p &^ AntCBitMask, nil
 	} else {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }
 func (p Player) TakeAGrasshopper() (Player, error) {
 	if p.Grasshoppers() == 3 {
-		return p | GrasshopperAMask, nil
+		return p &^ GrasshopperAMask, nil
 	} else if p.Grasshoppers() == 2 {
-		return p | GrasshopperBMask, nil
+		return p &^ GrasshopperBMask, nil
 	} else if p.Grasshoppers() == 1 {
-		return p | GrasshopperCMask, nil
+		return p &^ GrasshopperCMask, nil
 	} else {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }
 func (p Player) TakeABeetle() (Player, error) {
 	if p.Beetles() == 2 {
-		return p | BeetleAMask, nil
+		return p &^ BeetleAMask, nil
 	} else if p.Beetles() == 1 {
-		return p | BeetleBMask, nil
+		return p &^ BeetleBMask, nil
 	} else {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }
 func (p Player) TakeASpider() (Player, error) {
 	if p.Spiders() == 2 {
-		return p | SpiderAMask, nil
+		return p &^ SpiderAMask, nil
 	} else if p.Spiders() == 1 {
-		return p | SpiderBMask, nil
+		return p &^ SpiderBMask, nil
 	} else {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
@@ -138,19 +143,19 @@ func (p Player) TakeMosquito() (Player, error) {
 	if !p.HasMosquito() {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
-	return p | MosquitoMask, nil
+	return p &^ MosquitoMask, nil
 }
 func (p Player) TakeLadybug() (Player, error) {
 	if !p.HasLadybug() {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
-	return p | LadybugMask, nil
+	return p &^ LadybugMask, nil
 }
 func (p Player) TakePillBug() (Player, error) {
 	if !p.HasPillBug() {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
-	return p | PillBugMask, nil
+	return p &^ PillBugMask, nil
 }
 
 var ErrNoPieceAvailable = fmt.Errorf("attempted to take piece that has none left to take")

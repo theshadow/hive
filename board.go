@@ -41,23 +41,37 @@ func (brd *Board) Cell(c Coordinate) (Piece, bool) {
 	return ZeroPiece, false
 }
 
-func (brd *Board) Neighbors(c Coordinate) ([7]Piece, error) {
-	var neighbors [7]Piece
-
+// Return an array with seven elements, each element represents one
+// of the edges of the piece. We colloquially name these North, Northeast,
+// Southeast, South, Southwest, Northwest, and Above respectively. By default it
+// is always assumed that the top flat edge is always considered North and
+// that the additional edges continue in a clockwise fashion around the piece.
+//
+// formation := [7]Piece{
+//     // North,
+//     // Northeast,
+//     // Southeast,
+//     // South,
+//     // Southwest,
+//     // Northwest,
+//     // Above,
+// }
+//
+func (brd *Board) Neighbors(c Coordinate) (formation [7]Piece, err error) {
 	if _, ok := brd.Cell(c); !ok {
-		return neighbors, ErrInvalidCoordinate
+		return formation, ErrInvalidCoordinate
 	}
 
 	for i, loc := range neighborsMatrix {
 		loc = c.Add(loc)
 		if p, ok := brd.Cell(loc); ok {
-			neighbors[i] = p
+			formation[i] = p
 		} else {
-			neighbors[i] = ZeroPiece
+			formation[i] = ZeroPiece
 		}
 	}
 
-	return neighbors, nil
+	return formation, nil
 }
 
 func (brd *Board) Pieces() []cell {
@@ -93,9 +107,10 @@ type cell struct {
 
 const (
 	North = iota
-	NorthEast
-	SouthEast
+	Northeast
+	Southeast
 	South
 	Southwest
 	Northwest
+	Above
 )
