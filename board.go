@@ -57,6 +57,7 @@ func (brd *Board) Cell(c Coordinate) (Piece, bool) {
 //     // Above,
 // }
 //
+// Will return an error when the supplied coordinate isn't a valid location
 func (brd *Board) Neighbors(c Coordinate) (formation [7]Piece, err error) {
 	if _, ok := brd.Cell(c); !ok {
 		return formation, ErrInvalidCoordinate
@@ -77,6 +78,8 @@ func (brd *Board) Neighbors(c Coordinate) (formation [7]Piece, err error) {
 func (brd *Board) Pieces() []cell {
 	return brd.cells
 }
+
+var Origin = Coordinate(0)
 
 var ErrInvalidCoordinate = fmt.Errorf("the specified coordinate is invalid")
 

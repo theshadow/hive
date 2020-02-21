@@ -81,7 +81,6 @@ func (f Formation) isPinned() bool {
 	}
 	return isPinned(f.bitField())
 }
-
 // contacts returns the number of edges with pieces ignoring Above
 // as it's not necessary for any algorithms and makes checks
 // further on more complicated.
@@ -124,6 +123,10 @@ func (f Formation) above() Piece {
 	return f[Above]
 }
 
+func (f Formation) IsSuffocating() bool {
+	return f.contacts() == 6
+}
+
 // given an integer form of a formation reference
 // the formationMap and if the formation exists
 // return true, otherwise return false.
@@ -153,6 +156,7 @@ var formationMap = map[int]int{
 	45: Butterfly,
 	54: Butterfly,
 }
+
 
 const (
 	NoFormation = iota

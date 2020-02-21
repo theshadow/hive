@@ -15,6 +15,12 @@ type Game struct {
 	white Player
 	black Player
 
+	// Track the coordinate of each queen to quickly detect victory
+	// states without having to perform an O(n) over all pieces
+	// on the board to find the queen pieces.
+	whiteQueen Coordinate
+	blackQueen Coordinate
+
 	// current board state
 	board *Board
 
@@ -39,6 +45,11 @@ func NewGame() *Game {
 }
 
 // TODO: Test this function
+// Place will accept a piece and a coordinate and attempt
+// to place it on the board at the specified coordinate
+// if the specified coordinate is an invalid space due to
+// game rules or if the player does not have the piece to
+// place it will return an error.
 func (g *Game) Place(p Piece, c Coordinate) error {
 	// Is it this players turn to place a piece?
 	//     no: ErrNotPlayersTurn
@@ -74,15 +85,20 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 	// place the piece
 	g.board.Place(p, c)
 
+	// turn management
+	if p.IsQueen() {
+		g.updatePlayerQueen(c)
+	}
 	g.tickParalyzedPieces()
-
-	// flip who's turn it is
 	g.toggleTurn()
 
 	return nil
 }
 
 // TODO: Implement rules for movement
+// Move accepts two coordinates and attempts to move the piece found at (a) to (b).
+// It will return an error if the movement violates any game rules or if the specified
+// coordinate for (a) is invalid.
 func (g *Game) Move(a, b Coordinate) error {
 	// Is this a valid piece to move?
 	piece, ok := g.board.Cell(a)
@@ -92,11 +108,6 @@ func (g *Game) Move(a, b Coordinate) error {
 
 	// figure out which currentPlayer we should be working with
 	player := g.currentPlayer()
-
-	// figure out which currentPlayer we should be working with
-	if err := g.takeAPiece(piece, player); err != nil {
-		return err
-	}
 
 	// Is this currentPlayer allowed to move?
 	//     no: ErrNotPlayersTurn
@@ -110,17 +121,20 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrMustPlaceQueenToMove
 	}
 
-	// TODO: Implement Rule of sliding
 	// Is this piece allowed to move?
 	//     - Rule of sliding
 	//     - Paralyzed after Pill Bug action
 	//     no: ErrPieceMayNotMove
-	// TODO: Implement the rule of sliding
-	// If 5 sides have pieces it can't slide
-	// If 4 sides in a space ship or butterfly formation it can't slide
-	// If 3 sides in an uneven butterfly formation it can't slide
-
-
+	// If the formation of the neighbors is pinning the piece at the specified coordinate
+	// then it may not move.
+	if neighbors, err := g.board.Neighbors(a); err == nil && Formation(neighbors).isPinned() {
+		return ErrPieceMayNotMove
+	} else if err != nil {
+		// There isn't a piece at (a).
+		// TODO: ErrInvalidMove is way to vague here it failed for a reason the message doesn't announce
+		//  this is a concern.
+		return ErrInvalidMove
+	}
 
 	// if the piece is paralyzed the player can't move it
 	if g.pieceIsParalyzed(a) {
@@ -145,8 +159,8 @@ func (g *Game) Move(a, b Coordinate) error {
 	// mask that made the pathing algorithm see those cells as empty. Thus a lady
 	// bug can path over pieces. That might work, I think there are some edge cases.
 	//
-	// If A is a piece touching a pillbug / (mosquito:pillbug) of the right color
-	// and A is not paralyzed, and the pillbug / (mosquito:pillbug) is not paralyzed,
+	// If A is a piece touching a pill bug / (mosquito:pill bug) of the right color
+	// and A is not paralyzed, and the pill bug / (mosquito:pill bug) is not paralyzed,
 	// and B is an empty cell. Move A to B and return nil.
 
 	// TODO: How does mosquito movement work? This may be another custom Move function,
@@ -160,15 +174,66 @@ func (g *Game) Move(a, b Coordinate) error {
 		return err
 	}
 
-	// free pieces after the paralyzation ends
+	// turn management
+	if piece.IsQueen() {
+		g.updatePlayerQueen(b)
+	}
 	g.tickParalyzedPieces()
-
-	// flip who's turn it is
 	g.toggleTurn()
 
 	return nil
 }
+// Winner returns the player that won the game, if the game is not over
+// this method will return an error.
+func (g *Game) Winner() (Player, error) {
+	if !g.Over() {
+		return ZeroPlayer, ErrGameNotOver
+	}
+	return g.currentPlayer(), nil
+}
+// If either player has a suffocating queen then the game is over.
+func (g *Game) Over() bool {
+	// have they placed their queen?
+	if g.black.HasQueen() == false {
+		// I'm ignoring this error for a reason of long winded logic
+		//
+		// tldr; It should be impossible to reach this point and have a false victory.
+		//
+		// The only way Neighbors() can return an error is if the supplied coordinate
+		// is invalid. Based on the game rules the first piece will be placed at the
+		// origin so it would be impossible to reach this conditional while the player
+		// also has a queen to place.
+		//
+		// Further, the only time where there may be a false victory is IF the
+		// queen had a coordinate at the origin in the game state but the board
+		// had the piece at origin that was not a queen. In that state, we would
+		// have a false victory. However, we can't reach here without a queen being placed,
+		// and the only way for a queen to have an origin coordinate is if the player
+		// places or moves their queen to origin.
+		neighbors, _ := g.board.Neighbors(g.blackQueen)
+		formation := Formation(neighbors)
+		if formation.IsSuffocating() {
+			return true
+		}
+	}
 
+	if g.white.HasQueen() == false {
+		neighbors, _ := g.board.Neighbors(g.whiteQueen)
+		formation := Formation(neighbors)
+		if formation.IsSuffocating() {
+			return true
+		}
+	}
+
+	return false
+}
+func (g *Game) updatePlayerQueen(c Coordinate) {
+	if g.currentPlayer().IsWhite() {
+		g.whiteQueen = c
+	} else {
+		g.blackQueen = c
+	}
+}
 func (g *Game) takeAPiece(p Piece, player Player) error {
 	player, err := takeAPiece(p, g.currentPlayer())
 	if err != nil {
@@ -277,6 +342,7 @@ const (
 	FourthTurn = 4
 )
 
+var ErrGameNotOver = fmt.Errorf("there isn't a declared winner as the game is not over")
 var ErrUnknownPiece = fmt.Errorf("an unknown piece was encountered")
 var ErrInvalidPlacement = fmt.Errorf("the specified placement is invalid")
 var ErrInvalidMove = fmt.Errorf("the specified move is invalid")
