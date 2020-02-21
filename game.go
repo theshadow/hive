@@ -21,6 +21,8 @@ type Game struct {
 	whiteQueen Coordinate
 	blackQueen Coordinate
 
+	tie bool
+
 	// current board state
 	board *Board
 
@@ -185,14 +187,38 @@ func (g *Game) Move(a, b Coordinate) error {
 }
 // Winner returns the player that won the game, if the game is not over
 // this method will return an error.
+//
+// If there is a tie it will return a ZeroPlayer with a nil error.
 func (g *Game) Winner() (Player, error) {
 	if !g.Over() {
 		return ZeroPlayer, ErrGameNotOver
 	}
-	return g.currentPlayer(), nil
+
+	if g.tie {
+		return ZeroPlayer, nil
+	}
+
+	// As we toggle the player at the end of a turn we determine
+	// the winner to be the person who the current player isn't.
+	var winner Player
+	if !g.currentPlayer().IsWhite() {
+		winner = g.white
+	} else if !g.currentPlayer().IsBlack() {
+		winner = g.black
+	}
+
+	return winner, nil
 }
 // If either player has a suffocating queen then the game is over.
 func (g *Game) Over() bool {
+	// if both players have their queen then the game is not over.
+	if g.black.HasQueen() && g.white.HasQueen() {
+		return false
+	}
+
+	whiteSuffocating := false
+	blackSuffocating := false
+
 	// have they placed their queen?
 	if g.black.HasQueen() == false {
 		// I'm ignoring this error for a reason of long winded logic
@@ -212,17 +238,21 @@ func (g *Game) Over() bool {
 		// places or moves their queen to origin.
 		neighbors, _ := g.board.Neighbors(g.blackQueen)
 		formation := Formation(neighbors)
-		if formation.IsSuffocating() {
-			return true
-		}
+		blackSuffocating = formation.IsSuffocating()
 	}
 
 	if g.white.HasQueen() == false {
 		neighbors, _ := g.board.Neighbors(g.whiteQueen)
 		formation := Formation(neighbors)
-		if formation.IsSuffocating() {
-			return true
-		}
+		whiteSuffocating = formation.IsSuffocating()
+	}
+
+	// tie
+	if blackSuffocating && whiteSuffocating {
+		g.tie = true
+		return true
+	} else if blackSuffocating || whiteSuffocating {
+		return true
 	}
 
 	return false
