@@ -24,6 +24,13 @@ func NewPiece(color, bug, piece uint8) Piece {
 	(&p).Set(color, bug, piece)
 	return p
 }
+func NewBlackPiece(bug, piece uint8) Piece {
+	return NewPiece(BlackColor, bug, piece)
+}
+func NewWhitePiece(bug, piece uint8) Piece {
+	return NewPiece(WhiteColor, bug, piece)
+}
+// TODO: Deprecate all Set() functions. This is not idomatic go.
 func (p *Piece) Set(color, bug, piece uint8) {
 	*p |= Piece(uint32(color) << 24)
 	*p |= Piece(uint32(bug) << 16)

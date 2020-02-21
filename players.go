@@ -157,6 +157,15 @@ func (p Player) TakePillBug() (Player, error) {
 	}
 	return p &^ PillBugMask, nil
 }
+func (p Player) String() string {
+	color := "White"
+	if p.IsBlack() {
+		color = "Black"
+	}
+	return fmt.Sprintf("Color: %s, Queen: %t, Ant(s): %d, Grasshopper(s): %d, Beetle(s): %d, Spider(s): %d, Mosquitos: %t, Ladybug: %t, PillBug: %t",
+		color, p.HasQueen(), p.Ants(), p.Grasshoppers(), p.Beetles(), p.Spiders(), p.HasMosquito(), p.HasLadybug(),
+		p.HasPillBug())
+}
 
 var ErrNoPieceAvailable = fmt.Errorf("attempted to take piece that has none left to take")
 

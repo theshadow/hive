@@ -40,6 +40,9 @@ type Game struct {
 func NewGame() *Game {
 	return &Game{
 		turns:           1, // makes math clearer and makes more sense to start at 1 instead of 0
+		turn:            WhiteColor,
+		white:           NewPlayer(),
+		black:           NewPlayer(),
 		board:           NewBoard(),
 		moves:           []Move{},
 		paralyzedPieces: make(map[Coordinate]int),
@@ -53,6 +56,11 @@ func NewGame() *Game {
 // game rules or if the player does not have the piece to
 // place it will return an error.
 func (g *Game) Place(p Piece, c Coordinate) error {
+	// the first piece to be placed must be at origin
+	if g.nTurns() == FirstTurn && c != Origin {
+		return ErrFirstPieceMustBeAtOrigin
+	}
+
 	// Is it this players turn to place a piece?
 	//     no: ErrNotPlayersTurn
 	if p.Color() != g.turn {
@@ -86,6 +94,9 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 
 	// place the piece
 	g.board.Place(p, c)
+
+	// update the history
+	g.moves = append(g.moves, NewMove(Placed, p, 0, c))
 
 	// turn management
 	if p.IsQueen() {
@@ -126,6 +137,7 @@ func (g *Game) Move(a, b Coordinate) error {
 	// Is this piece allowed to move?
 	//     - Rule of sliding
 	//     - Paralyzed after Pill Bug action
+	//     - Breaking the hive
 	//     no: ErrPieceMayNotMove
 	// If the formation of the neighbors is pinning the piece at the specified coordinate
 	// then it may not move.
@@ -134,7 +146,7 @@ func (g *Game) Move(a, b Coordinate) error {
 	} else if err != nil {
 		// There isn't a piece at (a).
 		// TODO: ErrInvalidMove is way to vague here it failed for a reason the message doesn't announce
-		//  this is a concern.
+		//  this is a concern. Context!
 		return ErrInvalidMove
 	}
 
@@ -143,15 +155,14 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrPieceMayNotMove
 	}
 
+	// TODO: implement splitting hive on move
+	// If it can slide, and there are four neighbors there is no split.
+
 	// TODO: implement path validation
 	// Is this move valid?
-	//     - Breaking the hive
 	//     - Can this piece move to this location (pathing)
 	//     no: ErrInvalidMove
 
-	// TODO: implement splitting hive on move
-	// If it can slide, and there are four neighbors there is no split.
-	
 	// TODO: How does ladybug movement work?
 	// Probably a modified path algorithm where any cell with a piece within a distance of
 	// 2 from the ladybug is considered to have a height of zero?
@@ -176,6 +187,9 @@ func (g *Game) Move(a, b Coordinate) error {
 		return err
 	}
 
+	// update the history
+	g.moves = append(g.moves, NewMove(Moved, piece, a, b))
+
 	// turn management
 	if piece.IsQueen() {
 		g.updatePlayerQueen(b)
@@ -185,6 +199,7 @@ func (g *Game) Move(a, b Coordinate) error {
 
 	return nil
 }
+
 // Winner returns the player that won the game, if the game is not over
 // this method will return an error.
 //
@@ -209,6 +224,7 @@ func (g *Game) Winner() (Player, error) {
 
 	return winner, nil
 }
+
 // If either player has a suffocating queen then the game is over.
 func (g *Game) Over() bool {
 	// if both players have their queen then the game is not over.
@@ -223,7 +239,7 @@ func (g *Game) Over() bool {
 	if g.black.HasQueen() == false {
 		// I'm ignoring this error for a reason of long winded logic
 		//
-		// tldr; It should be impossible to reach this point and have a false victory.
+		// tl;dr — It should be impossible to reach this point and have a false victory.
 		//
 		// The only way Neighbors() can return an error is if the supplied coordinate
 		// is invalid. Based on the game rules the first piece will be placed at the
@@ -232,7 +248,7 @@ func (g *Game) Over() bool {
 		//
 		// Further, the only time where there may be a false victory is IF the
 		// queen had a coordinate at the origin in the game state but the board
-		// had the piece at origin that was not a queen. In that state, we would
+		// had a piece at origin that was not a queen. In that state, we would
 		// have a false victory. However, we can't reach here without a queen being placed,
 		// and the only way for a queen to have an origin coordinate is if the player
 		// places or moves their queen to origin.
@@ -369,9 +385,11 @@ func takeAPiece(p Piece, player Player) (Player, error) {
 }
 
 const (
+	FirstTurn  = 1
 	FourthTurn = 4
 )
 
+var ErrFirstPieceMustBeAtOrigin = fmt.Errorf("the first piece to be placed must be placed at origin")
 var ErrGameNotOver = fmt.Errorf("there isn't a declared winner as the game is not over")
 var ErrUnknownPiece = fmt.Errorf("an unknown piece was encountered")
 var ErrInvalidPlacement = fmt.Errorf("the specified placement is invalid")
@@ -381,4 +399,3 @@ var ErrNotPlayersTurn = fmt.Errorf("a currentPlayer may only move a piece on the
 var ErrMustPlaceQueen = fmt.Errorf("the currentPlayer must place their queen by the fourth turns")
 var ErrMustPlaceQueenToMove = fmt.Errorf("the players queen must be placed before a placed piece may move")
 var ErrPieceAlreadyParalyzed = fmt.Errorf("the piece is already paralyzed and may not be stunned again this turn")
-
