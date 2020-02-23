@@ -1,7 +1,6 @@
 package hived
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -69,70 +68,3 @@ func TestPlayer_Ants(t *testing.T) {
 	}
 }
 
-func TestPlayer_Grasshoppers(t *testing.T) {
-	tests := []struct {
-		bug   string
-		count int
-	}{
-		{bug: "Ant", count: 3},
-		{bug: "Grasshopper", count: 3},
-		{bug: "Beetle", count: 2},
-		{bug: "Spider", count: 2},
-	}
-
-	fnCount := func(p Player, bug string) int {
-		if bug == "Ant" {
-			return p.Ants()
-		} else if bug == "Grasshopper" {
-			return p.Grasshoppers()
-		} else if bug == "Beetle" {
-			return p.Beetles()
-		} else if bug == "Spider" {
-			return p.Spiders()
-		}
-		return 0
-	}
-
-	fnTake := func(p Player, bug string) (Player, error) {
-		if bug == "Ant" {
-			return p.TakeAnAnt()
-		} else if bug == "Grasshopper" {
-			return p.TakeAGrasshopper()
-		} else if bug == "Beetle" {
-			return p.TakeABeetle()
-		} else if bug == "Spider" {
-			return p.TakeASpider()
-		}
-		return ZeroPlayer, fmt.Errorf("undefined bug handler %s", bug)
-	}
-
-	for _, test := range tests {
-		pOrig := NewPlayer()
-
-		if fnCount(pOrig, test.bug) != test.count {
-			t.Logf("Player: %16b %ss: %d", pOrig, test.bug, fnCount(pOrig, test.bug))
-			t.Logf("a new player doesn't have 3 %ss", test.bug)
-			t.Fail()
-		}
-
-		for i := test.count; i > 0; i-- {
-			pNew, err := fnTake(pOrig, test.bug)
-			if err != nil {
-				t.Logf("unable to take %sA: %s", test.bug, err)
-				t.Fail()
-			} else if fnCount(pNew, test.bug) != i-1 {
-				t.Logf("Before: %16b After: %16b %s: %d", pOrig, pNew, test.bug, fnCount(pNew, test.bug))
-				t.Logf("after taking an %s from a player there wasn't %d %s(s) left", test.bug, i-1, test.bug)
-				t.Fail()
-			}
-			pOrig = pNew
-		}
-
-		_, err := fnTake(pOrig, test.bug)
-		if err == nil {
-			t.Logf("Before: %16b %s: %d", pOrig, test.bug, fnCount(pOrig, test.bug))
-			t.Logf("expected an error when trying to take an %s with zero remaining", test.bug)
-			t.Fail()
-		}
-	}
-}

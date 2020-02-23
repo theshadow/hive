@@ -6,10 +6,8 @@ func TestMove_Set(t *testing.T) {
 	var p Piece
 	(&p).Set(WhiteColor, Grasshopper, PieceC)
 
-	var src Coordinate
-	(&src).Set(2, 3, 4, 5)
-	var dst Coordinate
-	(&dst).Set(6, 7, 8, 9)
+	src := NewCoordinate(2, 3, 4, 5)
+	dst := NewCoordinate(6, 7, 8, 9)
 
 	var m Move
 	(&m).Set(Moved, p, src, dst)

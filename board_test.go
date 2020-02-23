@@ -90,9 +90,10 @@ func TestBoard_Neighbors(t *testing.T) {
 
 	// use the neighbors matrix to place each piece manually
 	for idx, op := range otherPieces {
-		err := board.Place(op, origin.Add(neighborsMatrix[idx]))
+		coord := origin.Add(neighborsMatrix[idx])
+		err := board.Place(op, coord)
 		if err != nil {
-			t.Log("tried to place two pieces at the same coordinate")
+			t.Logf("failed to place origin: %s location: %s error: %s", origin, coord, err)
 			t.Fail()
 			break
 		}

@@ -1,20 +1,43 @@
-VERSION ?= $(shell head -n 1 VERSION)
+VERSION ?=$(shell head -n 1 VERSION)
+GITREF ?=$(shell git describe --always --dirty 2> /dev/null || echo 0000000)
+BUILD ?=$(GITREF)
 
-all: test static-analysis build
-.PHONY: test static-analysis build formatting _docs _artifacts
+OUTPUT_PREFIX ?=hived-$(VERSION)
 
-test:
+OUTPUT_LIB :=$(OUTPUT_PREFIX).so
+OUTPUT_ARCHIVE :=$(OUTPUT_PREFIX).zip
+
+LDFLAGS :=-ldflags "-X github.com/theshadow/hived.Version=$(VERSION) -X github.com/theshadow/hived.BuildID=$(BUILD)"
+
+all: static-analysis tests build
+.PHONY: build formatting static-analysis test _archive _artifacts _docs
+
+tests:
 	go test .../..
 
 static-analysis:
 	go vet .../..
 
-build: _artifacts _docs
+docker-container:
+	docker build -t theshadow/hived .
+
+build: _artifacts _docs _archive
+
+tag:
+	git tag v$(VERSION)
+
+release:
+	hub create -a $(OUTPUT_ARCHIVE) $(BUILD)
 
 _docs:
-	cd docs; make;
+	cd docs; sphinx-build -b html -D release=$(VERSION) . _build
+
+_archive:
+	mkdir -p _build/docs
+	cp cmd/library/$(OUTPUT_LIB) _build
+	cp --recursive docs/_build/* _build/docs
+	cd _build; zip -r $(OUTPUT_ARCHIVE) .
 
 _artifacts:
-	go build -buildmode=plugin -o hived-$(VERSION).so .../..
-
+	cd cmd/library; go build -buildmode=plugin $(LDFLAGS) -o hived-$(VERSION).so .../..
 
