@@ -217,7 +217,6 @@ func (g *Game) Move(a, b Coordinate) error {
 
 	return nil
 }
-
 // Winner returns the player that won the game, if the game is not over
 // this method will return an error.
 //

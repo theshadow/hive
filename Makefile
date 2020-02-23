@@ -6,9 +6,6 @@ all: test static-analysis build
 test:
 	go test .../..
 
-formatting:
-	go fmt .../..
-
 static-analysis:
 	go vet .../..
 
