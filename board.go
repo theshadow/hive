@@ -68,6 +68,7 @@ func (brd *Board) Move(a, b Coordinate) error {
 	}
 	return ErrInvalidCoordinate
 }
+
 // Cell will return true when there is a piece at that coordinate
 //
 func (brd *Board) Cell(c Coordinate) (Piece, bool) {

@@ -70,17 +70,17 @@ func TestPlayer_Ants(t *testing.T) {
 }
 
 func TestPlayer_Grasshoppers(t *testing.T) {
-	tests := []struct{
-		bug string
+	tests := []struct {
+		bug   string
 		count int
 	}{
-		{ bug: "Ant", count: 3 },
-		{ bug: "Grasshopper", count: 3 },
-		{ bug: "Beetle", count: 2 },
-		{ bug: "Spider", count: 2 },
+		{bug: "Ant", count: 3},
+		{bug: "Grasshopper", count: 3},
+		{bug: "Beetle", count: 2},
+		{bug: "Spider", count: 2},
 	}
 
-	fnCount := func (p Player, bug string) int {
+	fnCount := func(p Player, bug string) int {
 		if bug == "Ant" {
 			return p.Ants()
 		} else if bug == "Grasshopper" {
@@ -93,7 +93,7 @@ func TestPlayer_Grasshoppers(t *testing.T) {
 		return 0
 	}
 
-	fnTake := func (p Player, bug string) (Player, error) {
+	fnTake := func(p Player, bug string) (Player, error) {
 		if bug == "Ant" {
 			return p.TakeAnAnt()
 		} else if bug == "Grasshopper" {

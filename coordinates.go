@@ -4,8 +4,8 @@ import "fmt"
 
 /* Used to represent a specific cell on the board
 
-      X        Y        Z       H
-  11111111|11111111|11111111|11111111
+    X        Y        Z       H
+11111111|11111111|11111111|11111111
 */
 type Coordinate uint32
 

@@ -4,21 +4,22 @@ import "fmt"
 
 /* A currentPlayer tracks the color and remaining cells the currentPlayer has.
 
-	 . Unused
-	(C)olor
-	(Q)ueen
-	(A)nt         x 3
-	(G)rasshopper x 3
-	(B)eetle      x 2
-	(S)pider      x 2
-	(M)osquito
-	(L)adybug
-	(P)ill Bug
+ . Unused
+(C)olor
+(Q)ueen
+(A)nt         x 3
+(G)rasshopper x 3
+(B)eetle      x 2
+(S)pider      x 2
+(M)osquito
+(L)adybug
+(P)ill Bug
 
-	.CQA|AAGG|GBBS|SMLP
-	1111|1111|1111|1111
+.CQA|AAGG|GBBS|SMLP
+1111|1111|1111|1111
 */
 type Player uint16
+
 func NewPlayer() (p Player) {
 	// flip everything on and shift off the
 	// unused bit just to be consistent and tidy.
@@ -117,7 +118,7 @@ func (p Player) TakeAGrasshopper() (Player, error) {
 		return p &^ GrasshopperBMask, nil
 	} else if p.Grasshoppers() == 1 {
 		return p &^ GrasshopperCMask, nil
-		} else {
+	} else {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }

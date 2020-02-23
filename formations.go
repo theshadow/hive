@@ -62,12 +62,14 @@ package hived
 //       a part of the formation set? Would this be cheaper operationally?
 //
 type Formation [7]Piece
+
 func (f Formation) CanSlide() bool {
 	return f.isPinned()
 }
 func (f Formation) MaySplitHive() bool {
 	return f.inBrokenButterfly()
 }
+
 // TODO: Make this function work.
 func (f Formation) inBrokenButterfly() bool {
 	return false
@@ -81,6 +83,7 @@ func (f Formation) isPinned() bool {
 	}
 	return isPinned(f.bitField())
 }
+
 // contacts returns the number of edges with pieces ignoring Above
 // as it's not necessary for any algorithms and makes checks
 // further on more complicated.
@@ -92,6 +95,7 @@ func (f Formation) contacts() (count int) {
 	}
 	return count
 }
+
 // bitField returns the formation information encoded into an integer by
 // representing each contact point as a bit. This allows us to derive an
 // integer value for a given formation and use that to quickly determine
@@ -156,7 +160,6 @@ var formationMap = map[int]int{
 	45: Butterfly,
 	54: Butterfly,
 }
-
 
 const (
 	NoFormation = iota
