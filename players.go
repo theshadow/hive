@@ -117,7 +117,7 @@ func (p Player) TakeAGrasshopper() (Player, error) {
 		return p &^ GrasshopperBMask, nil
 	} else if p.Grasshoppers() == 1 {
 		return p &^ GrasshopperCMask, nil
-	} else {
+		} else {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }

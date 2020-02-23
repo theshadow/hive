@@ -7,15 +7,15 @@ func TestBoard_Place(t *testing.T) {
 
 	pieceA := NewPiece(WhiteColor, Grasshopper, PieceA)
 	cPieceA := NewCoordinate(0, 0, 0, 0)
-	board.Place(pieceA, cPieceA)
+	_ = board.Place(pieceA, cPieceA)
 
 	pieceB := NewPiece(BlackColor, Grasshopper, PieceA)
 	cPieceB := NewCoordinate(1, 1, 1, 0)
-	board.Place(pieceB, cPieceB)
+	_ = board.Place(pieceB, cPieceB)
 
 	pieceC := NewPiece(WhiteColor, Queen, PieceA)
 	cPieceC := NewCoordinate(2, 2, 2, 0)
-	board.Place(pieceC, cPieceC)
+	_ = board.Place(pieceC, cPieceC)
 
 	if p, ok := board.Cell(cPieceA); !ok || p != pieceA {
 		t.Logf("Cell didn't return expected piece")
@@ -43,7 +43,7 @@ func TestBoard_Move(t *testing.T) {
 	cA := NewCoordinate(0, 0, 0, 0)
 	cB := NewCoordinate(1, 1, 1, 0)
 
-	board.Place(p, cA)
+	_ = board.Place(p, cA)
 	if err := board.Move(cA, cB); err != nil {
 		t.Logf("couldn't move piece on the board")
 		t.Fail()
@@ -86,11 +86,16 @@ func TestBoard_Neighbors(t *testing.T) {
 		NewPiece(BlackColor, Beetle, PieceB),
 	}
 
-	board.Place(pWhiteGrasshopperA, origin)
+	_ = board.Place(pWhiteGrasshopperA, origin)
 
 	// use the neighbors matrix to place each piece manually
 	for idx, op := range otherPieces {
-		board.Place(op, origin.Add(neighborsMatrix[idx]))
+		err := board.Place(op, origin.Add(neighborsMatrix[idx]))
+		if err != nil {
+			t.Log("tried to place two pieces at the same coordinate")
+			t.Fail()
+			break
+		}
 	}
 
 	// grab the neighbors and compare

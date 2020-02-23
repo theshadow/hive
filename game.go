@@ -1,6 +1,8 @@
 package hived
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Game maintains the game instance state
 type Game struct {
@@ -26,8 +28,9 @@ type Game struct {
 	// current board state
 	board *Board
 
+	// TODO: Should the game know its history or should the session?
 	// each move for this game
-	moves []Move
+	history []Move
 
 	// Track the pieces that are paralyzed by mapping the location of the piece to a
 	// time till free value. When the value is zero, the piece is removed from the map
@@ -35,18 +38,29 @@ type Game struct {
 	//
 	// After each turn the the value is decremented by one.
 	paralyzedPieces map[Coordinate]int
+
+	// feature flags
+	features map[Feature]bool
 }
 
-func NewGame() *Game {
+func NewGame(features []Feature) *Game {
+	featureMap := copyFeatureMap()
+	if features != nil {
+		for _, f := range features {
+			featureMap[f] = true
+		}
+	}
 	return &Game{
 		turns:           1, // makes math clearer and makes more sense to start at 1 instead of 0
 		turn:            WhiteColor,
 		white:           NewPlayer(),
 		black:           NewPlayer(),
 		board:           NewBoard(),
-		moves:           []Move{},
+		history:         []Move{},
 		paralyzedPieces: make(map[Coordinate]int),
+		features:        featureMap,
 	}
+
 }
 
 // TODO: Test this function
@@ -57,52 +71,57 @@ func NewGame() *Game {
 // place it will return an error.
 func (g *Game) Place(p Piece, c Coordinate) error {
 	// the first piece to be placed must be at origin
-	if g.nTurns() == FirstTurn && c != Origin {
+	if g.turns == FirstTurn && c != Origin {
 		return ErrFirstPieceMustBeAtOrigin
 	}
 
 	// Is it this players turn to place a piece?
-	//     no: ErrNotPlayersTurn
 	if p.Color() != g.turn {
 		return ErrNotPlayersTurn
 	}
 
-	// figure out which currentPlayer we should be working with
-	if err := g.takeAPiece(p, g.currentPlayer()); err != nil {
+	player := g.currentPlayer()
+
+	// take a piece
+	if err := g.takeAPiece(p, player); err != nil {
 		return err
 	}
 
 	// Is this the fourth turn and has the currentPlayer placed their queen or is this piece their queen?
-	//     no: ErrMustPlaceQueen
-	if g.nTurns() == FourthTurn && g.currentPlayer().HasQueen() {
+	if g.turns == FourthTurn && player.HasQueen() {
 		return ErrMustPlaceQueen
 	}
 
 	// Is this placement valid?
 	//     - Is it on the surface? (H == 0)
 	//     - Is it touching the opponents piece? (neighbors)
-	//     no ErrInvalidPlacement
-	// Place the piece
+	//     no ErrMustPlacePieceOnSurface
 	if c.H() > 0 {
-		return ErrInvalidPlacement
+		return ErrMustPlacePieceOnSurface
 	}
 
-	// Validate that where this piece is being placed doesn't touch an opponents piece
-	if err := g.checkNeighbors(p, c); err != nil {
+	if g.turns == FirstTurn && g.featureEnabled(TournamentQueensRuleFeature) && p.IsQueen() {
+		return ErrMayNotPlaceQueenOnFirstTurn
+	} else if g.turns != FirstTurn {
+		// we must allow the players to place pieces that touch each other on the first turn, but never again.
+		if neighbors, _ := g.board.Neighbors(c); contactWithOpponentsPiece(p, neighbors) {
+			return ErrMayNotPlaceTouchingOpponentsPiece
+		}
+	}
+
+	// place the piece, we're not allowed to place two pieces at the same coordinate
+	if err := g.board.Place(p, c); err != nil {
 		return err
 	}
 
-	// place the piece
-	g.board.Place(p, c)
-
 	// update the history
-	g.moves = append(g.moves, NewMove(Placed, p, 0, c))
+	g.history = append(g.history, NewMove(Placed, p, 0, c))
 
 	// turn management
 	if p.IsQueen() {
 		g.updatePlayerQueen(c)
 	}
-	g.tickParalyzedPieces()
+
 	g.toggleTurn()
 
 	return nil
@@ -119,7 +138,7 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrInvalidCoordinate
 	}
 
-	// figure out which currentPlayer we should be working with
+	// figure out which player we should be working with
 	player := g.currentPlayer()
 
 	// Is this currentPlayer allowed to move?
@@ -188,13 +207,12 @@ func (g *Game) Move(a, b Coordinate) error {
 	}
 
 	// update the history
-	g.moves = append(g.moves, NewMove(Moved, piece, a, b))
+	g.history = append(g.history, NewMove(Moved, piece, a, b))
 
 	// turn management
 	if piece.IsQueen() {
 		g.updatePlayerQueen(b)
 	}
-	g.tickParalyzedPieces()
 	g.toggleTurn()
 
 	return nil
@@ -251,7 +269,7 @@ func (g *Game) Over() bool {
 		// had a piece at origin that was not a queen. In that state, we would
 		// have a false victory. However, we can't reach here without a queen being placed,
 		// and the only way for a queen to have an origin coordinate is if the player
-		// places or moves their queen to origin.
+		// places or history their queen to origin.
 		neighbors, _ := g.board.Neighbors(g.blackQueen)
 		formation := Formation(neighbors)
 		blackSuffocating = formation.IsSuffocating()
@@ -273,6 +291,9 @@ func (g *Game) Over() bool {
 
 	return false
 }
+func (g *Game) History() []Move {
+	return g.history
+}
 func (g *Game) updatePlayerQueen(c Coordinate) {
 	if g.currentPlayer().IsWhite() {
 		g.whiteQueen = c
@@ -293,28 +314,6 @@ func (g *Game) takeAPiece(p Piece, player Player) error {
 	return nil
 }
 
-// checks all of the neighbors and if any of them don't match the color of the
-// piece being placed it returns an error.
-func (g *Game) checkNeighbors(p Piece, c Coordinate) error {
-	neighbors, err := g.board.Neighbors(c)
-	if err != nil {
-		return err
-	}
-
-	for _, n := range neighbors {
-		// don't care about zero pieces
-		if n == ZeroPiece {
-			continue
-		}
-
-		// TODO: Are there any other rules about neighbors and placement???
-		if p.Color() != n.Color() {
-			// TODO: Log which piece is offending?
-			return ErrInvalidPlacement
-		}
-	}
-	return nil
-}
 func (g *Game) currentPlayer() Player {
 	// figure out which currentPlayer we should be working with
 	if g.turn == WhiteColor {
@@ -327,6 +326,8 @@ func (g *Game) toggleTurn() {
 	if g.turn == WhiteColor {
 		g.turn = BlackColor
 	} else {
+		g.tickParalyzedPieces()
+
 		g.turn = WhiteColor
 		g.turns++
 	}
@@ -359,8 +360,31 @@ func (g *Game) tickParalyzedPieces() {
 	}
 }
 
-func (g *Game) nTurns() int {
-	return int(g.turns)
+func (g *Game) featureEnabled(f Feature) bool {
+	_, ok := g.features[f]
+	return ok
+}
+
+func contactWithOpponentsPiece(p Piece, neighbors [7]Piece) bool {
+	color := NoColor
+	if p.Color() == WhiteColor {
+		color = BlackColor
+	} else {
+		color = WhiteColor
+	}
+
+	for _, n := range neighbors {
+		// don't care about zero pieces
+		if n == ZeroPiece {
+			continue
+		}
+
+		if n.Color() == color {
+			return true
+		}
+	}
+
+	return false
 }
 
 func takeAPiece(p Piece, player Player) (Player, error) {
@@ -384,18 +408,55 @@ func takeAPiece(p Piece, player Player) (Player, error) {
 	return ZeroPlayer, ErrUnknownPiece
 }
 
+type Winner int
+
 const (
 	FirstTurn  = 1
 	FourthTurn = 4
+
+	Tie         Winner = 0
+	BlackPlayer Winner = 1
+	WhitePlayer Winner = 2
 )
 
 var ErrFirstPieceMustBeAtOrigin = fmt.Errorf("the first piece to be placed must be placed at origin")
 var ErrGameNotOver = fmt.Errorf("there isn't a declared winner as the game is not over")
 var ErrUnknownPiece = fmt.Errorf("an unknown piece was encountered")
-var ErrInvalidPlacement = fmt.Errorf("the specified placement is invalid")
+
+var ErrMustPlacePieceOnSurface = fmt.Errorf("a piece must be placed on the surface of the board")
+var ErrMayNotPlaceTouchingOpponentsPiece = fmt.Errorf("the player may not place a piece where it will touch an opponents piece after the first turn")
+
+var ErrMayNotPlaceQueenOnFirstTurn = fmt.Errorf("tournament rules: a player may not place their queen on the first turn")
+
 var ErrInvalidMove = fmt.Errorf("the specified move is invalid")
 var ErrPieceMayNotMove = fmt.Errorf("this piece may not move")
-var ErrNotPlayersTurn = fmt.Errorf("a currentPlayer may only move a piece on their turns")
-var ErrMustPlaceQueen = fmt.Errorf("the currentPlayer must place their queen by the fourth turns")
+var ErrNotPlayersTurn = fmt.Errorf("a player may only act on their turn")
+var ErrMustPlaceQueen = fmt.Errorf("the player must place their queen by the fourth turns")
 var ErrMustPlaceQueenToMove = fmt.Errorf("the players queen must be placed before a placed piece may move")
 var ErrPieceAlreadyParalyzed = fmt.Errorf("the piece is already paralyzed and may not be stunned again this turn")
+
+type Feature uint64
+
+const (
+	NoFeature Feature = iota
+	LadybugPieceFeature
+	PillBugPieceFeature
+	MosquitoPieceFeature
+
+	TournamentQueensRuleFeature
+)
+
+var featureMap = map[Feature]bool{
+	LadybugPieceFeature:         false,
+	PillBugPieceFeature:         false,
+	MosquitoPieceFeature:        false,
+	TournamentQueensRuleFeature: false,
+}
+
+func copyFeatureMap() (features map[Feature]bool) {
+	features = make(map[Feature]bool)
+	for k, v := range featureMap {
+		features[k] = v
+	}
+	return features
+}

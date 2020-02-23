@@ -19,10 +19,44 @@ func NewBoard() *Board {
 		cells:       []cell{},
 	}
 }
-func (brd *Board) Place(p Piece, c Coordinate) {
+
+// Place will return an error if there is already a piece at the specified coordinate.
+//
+// Should the board know about the game rules?
+//
+// With this definition the board will return an error if there is already a piece at
+// the specified coordinate. This is due to the fact that I'm accepting a trade off.
+// While there is merit and value in creating a more robust board that can manage
+// multiple pieces at a given location we will loose a valuable and in my opinion
+// cheap safety net that will help us validate game rules. Details about the
+// two arguments are outlined below.
+//
+// Hive doesn't allow two pieces to occupy the same coordinate, however, in a
+// more generic sense a hex board could, in theory, have multiple pieces in a cell
+// based on the game rules. To make a more generic board would require refactoring
+// the cells of the board to be able to contain multiple pieces and then devising
+// a system for exposing what pieces already exist and letting the game decide
+// what to do. However, there are concerns about the increase in complexity for the
+// memory management of the type.
+//
+// By returning an error I make validating game rules drastically more reliable as
+// the board will help guarantee the game rules don't do something stupid.
+// It also greatly simplifies the memory management of the type. Tracking multiple
+// pieces and deciding on a clear set of behavior when you Place or Move a piece
+// sounds like a daunting task and really not worth the effort.
+//
+// So, in conclusion, the value of making cells more robust at this juncture is
+// out stripped by the value of having a safety net.
+func (brd *Board) Place(p Piece, c Coordinate) error {
+	if _, ok := brd.Cell(c); ok {
+		return ErrMayNotPlaceAPieceOnAPiece
+	}
+
 	cl := cell{p, c}
 	brd.cells = append(brd.cells, cl)
 	brd.locationMap[cl.Coordinate] = len(brd.cells) - 1
+
+	return nil
 }
 func (brd *Board) Move(a, b Coordinate) error {
 	if idx, ok := brd.locationMap[a]; ok {
@@ -34,6 +68,8 @@ func (brd *Board) Move(a, b Coordinate) error {
 	}
 	return ErrInvalidCoordinate
 }
+// Cell will return true when there is a piece at that coordinate
+//
 func (brd *Board) Cell(c Coordinate) (Piece, bool) {
 	if idx, ok := brd.locationMap[c]; ok {
 		return brd.cells[idx].Piece, true
@@ -82,6 +118,7 @@ func (brd *Board) Pieces() []cell {
 var Origin = Coordinate(0)
 
 var ErrInvalidCoordinate = fmt.Errorf("the specified coordinate is invalid")
+var ErrMayNotPlaceAPieceOnAPiece = fmt.Errorf("may not place a piece where another piece exists")
 
 var neighborsMatrix = []Coordinate{
 	// North

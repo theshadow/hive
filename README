@@ -1,0 +1,54 @@
+HiveD - The Tiny Hive Board Game Engine
+=======================================
+
+Built as a tiny game engine with the purpose of providing a function rules engine for hive.
+
+Building
+--------
+
+    make
+
+Roadmap
+-------
+
+* [ ] Engine
+    * [ ] Rule Complete
+        * [X] Rule of Sliding
+        * [-] Rule of the Single Hive
+        * [X] Placement
+        * [-] Movement
+            * [ ] Queen
+            * [ ] Ant
+            * [ ] Grasshopper
+            * [ ] Spider
+            * [ ] Beetle
+            * [ ] Ladybug
+            * [ ] Pillbug
+            * [ ] Mosquito
+        * [X] Victory
+    * [-] Feature Flags
+        * [X] Tournament Rules
+        * [-] Pill Bug
+        * [-] Ladybug
+        * [-] Mosquito
+    * [X] Turn Management
+        * [ ] Track Turn History
+        * [X] Track paralyzed pieces
+* [ ] Project
+    * [ ] Hosting
+        * [X] Git Repo
+        * [ ] CICD
+        * [ ] Documentation
+    * [ ] Descriptor Files
+        * [-] README
+        * [X] VERSION
+        * [X] COPYRIGHT
+    * [ ] Pipeline
+        * [ ] Pre-commit Hooks
+        * [ ] Tests
+        * [ ] Formatting
+        * [ ] Static Analysis
+        * [ ] Build
+            * [ ] Binaries
+            * [ ] Generate Documentation
+        * [ ] Release
