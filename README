@@ -1,10 +1,39 @@
 HiveD - The Tiny Hive Board Game Engine
 =======================================
 
-Built as a tiny game engine with the purpose of providing a function rules engine for hive.
+Built as a tiny game engine with the purpose of providing a functional rules engine for hive.
+The goal is to main a small portable library that can be imported into other projects such as
+servers and clients.
+
+Build Environment Prerequisites
+-------------
+
+We recommend that you use the docker-container target if you're unsure of how to install or
+maintain these tools.
+
+- Build tools
+  - python-pip
+  - python-sphinx
+  - hub
+  - zip
+  - github.com/readthedocs/godocjson
+  - sphinx-autoapi
+  - sphinxcontrib-golangdomain
 
 Building
 --------
+
+The build target of the project is a shared library compiled into Go's plugin framework. To
+build the project locally you can use the docker-container make target if you have all of
+the necessary tools installed from the prerequisites section.
+
+Local Build
++++++++++++
+
+    make docker-container
+
+CICD Build
++++++++++++
 
     make
 
@@ -38,17 +67,17 @@ Roadmap
     * [ ] Hosting
         * [X] Git Repo
         * [ ] CICD
-        * [ ] Documentation
+        * [-] Documentation
     * [ ] Descriptor Files
         * [-] README
         * [X] VERSION
         * [X] COPYRIGHT
     * [ ] Pipeline
         * [ ] Pre-commit Hooks
-        * [ ] Tests
+        * [X] Tests
         * [ ] Formatting
-        * [ ] Static Analysis
+        * [X] Static Analysis
         * [ ] Build
-            * [ ] Binaries
-            * [ ] Generate Documentation
+            * [X] Binaries
+            * [X] Generate Documentation
         * [ ] Release
