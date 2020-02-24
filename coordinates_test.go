@@ -3,17 +3,17 @@ package hived
 import "testing"
 
 func TestCoordinate(t *testing.T) {
-	tests := []struct{
-		actual Coordinate
+	tests := []struct {
+		actual   Coordinate
 		expected uint32
 	}{
 		{
-			actual: NewCoordinate(1, 2, 3, 4),
-			expected: uint32(1 << 24) | uint32(2 << 16) | uint32(3 << 8) | uint32(4),
+			actual:   NewCoordinate(1, 2, 3, 4),
+			expected: uint32(1<<24) | uint32(2<<16) | uint32(3<<8) | uint32(4),
 		},
 		{
-			actual: NewCoordinate(-2, -3, -4, -5),
-			expected: uint32((0b10000000 | 2) << 24) | uint32((0b10000000 | 3) << 16) | uint32((0b10000000 | 4) << 8) | uint32(0b10000000 | 5),
+			actual:   NewCoordinate(-2, -3, -4, -5),
+			expected: uint32((0b10000000|2)<<24) | uint32((0b10000000|3)<<16) | uint32((0b10000000|4)<<8) | uint32(0b10000000|5),
 		},
 	}
 
@@ -31,12 +31,12 @@ func TestCoordinate(t *testing.T) {
 
 func TestCoordinate_Parts(t *testing.T) {
 
-	testCases := []struct{
-		c Coordinate
+	testCases := []struct {
+		c          Coordinate
 		x, y, z, h int8
 	}{
-		{NewCoordinate(1, 2, 3, 4), 1, 2, 3, 4 },
-		{NewCoordinate(-2, -3, -4, -5), -2, -3, -4, -5 },
+		{NewCoordinate(1, 2, 3, 4), 1, 2, 3, 4},
+		{NewCoordinate(-2, -3, -4, -5), -2, -3, -4, -5},
 	}
 
 	for _, test := range testCases {

@@ -67,4 +67,3 @@ func TestPlayer_Ants(t *testing.T) {
 		t.Fail()
 	}
 }
-

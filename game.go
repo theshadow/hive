@@ -269,7 +269,7 @@ func (g *Game) Over() bool {
 		// had a piece at origin that was not a queen. In that state, we would
 		// have a false victory. However, we can't reach here without a queen being placed,
 		// and the only way for a queen to have an origin coordinate is if the player
-		// places or history their queen to origin.
+		// places or moves their queen to the origin coordinate.
 		neighbors, _ := g.board.Neighbors(g.blackQueen)
 		formation := Formation(neighbors)
 		blackSuffocating = formation.IsSuffocating()

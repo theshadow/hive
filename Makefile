@@ -36,6 +36,8 @@ _archive:
 	mkdir -p _build/docs
 	cp cmd/library/$(OUTPUT_LIB) _build
 	cp --recursive docs/_build/* _build/docs
+	cp LICENSE _build
+	cp VERSION _build
 	cd _build; zip -r $(OUTPUT_ARCHIVE) .
 
 _artifacts:
