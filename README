@@ -6,7 +6,7 @@ The goal is to main a small portable library that can be imported into other pro
 servers and clients.
 
 Build Environment Prerequisites
--------------
+-------------------------------
 
 We recommend that you use the docker-container target if you're unsure of how to install or
 maintain these tools.
@@ -23,9 +23,7 @@ maintain these tools.
 Building
 --------
 
-The build target of the project is a shared library compiled into Go's plugin framework. To
-build the project locally you can use the docker-container make target if you have all of
-the necessary tools installed from the prerequisites section.
+The build target of the project is a shared library compiled into Go's plugin framework.
 
 Local Build
 +++++++++++
@@ -81,3 +79,9 @@ Roadmap
             * [X] Binaries
             * [X] Generate Documentation
         * [ ] Release
+
+F.A.Q
+-----
+
+    1. How do I access the docker container after performing a build?
+        * docker run -it theshadow/hived:latest /bin/bash
