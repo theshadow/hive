@@ -33,6 +33,8 @@ Local Build
 CICD Build
 +++++++++++
 
+You will need to ensure that all of the build environment tools are installed.
+
     make
 
 Roadmap
@@ -80,8 +82,8 @@ Roadmap
             * [X] Generate Documentation
         * [ ] Release
 
-F.A.Q
------
+F.A.Q.
+------
 
     1. How do I access the docker container after performing a build?
         * docker run -it theshadow/hived:latest /bin/bash
