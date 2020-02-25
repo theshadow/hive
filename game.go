@@ -110,8 +110,10 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 	}
 
 	// place the piece, we're not allowed to place two pieces at the same coordinate
-	if err := g.board.Place(p, c); err != nil {
+	if err := g.board.Place(p, c); err == ErrPauliExclusionPrinciple {
 		return ErrRuleMayNotPlaceAPieceOnAPiece
+	} else if err != nil {
+		return &ErrUnknownBoardError{err}
 	}
 
 	// update the history
@@ -422,6 +424,14 @@ const (
 var ErrGameNotOver = fmt.Errorf("there isn't a declared winner as the game is not over")
 var ErrUnknownPiece = fmt.Errorf("an unknown piece was encountered")
 var ErrInvalidMove = fmt.Errorf("the specified move is invalid")
+
+type ErrUnknownBoardError struct {
+	Err error
+}
+func (e *ErrUnknownBoardError) Error() string {
+	return fmt.Sprintf("encountered unknown board error")
+}
+func (e *ErrUnknownBoardError) Unwrap() error { return e.Err }
 
 var ErrRuleFirstPieceMustBeAtOrigin = fmt.Errorf("the first piece to be placed must be placed at origin")
 var ErrRuleMayNotPlaceAPieceOnAPiece = fmt.Errorf("may not place a piece where another piece exists")
