@@ -49,7 +49,7 @@ func NewBoard() *Board {
 // out stripped by the value of having a safety net.
 func (brd *Board) Place(p Piece, c Coordinate) error {
 	if _, ok := brd.Cell(c); ok {
-		return ErrMayNotPlaceAPieceOnAPiece
+		return ErrPauliExclusionPrinciple
 	}
 
 	cl := cell{p, c}
@@ -119,7 +119,7 @@ func (brd *Board) Pieces() []cell {
 var Origin = Coordinate(0)
 
 var ErrInvalidCoordinate = fmt.Errorf("the specified coordinate is invalid")
-var ErrMayNotPlaceAPieceOnAPiece = fmt.Errorf("may not place a piece where another piece exists")
+var ErrPauliExclusionPrinciple = fmt.Errorf("two pieces may not occupy the same coordinate")
 
 var neighborsMatrix = []Coordinate{
 	// North

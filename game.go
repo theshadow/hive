@@ -72,12 +72,12 @@ func NewGame(features []Feature) *Game {
 func (g *Game) Place(p Piece, c Coordinate) error {
 	// the first piece to be placed must be at origin
 	if g.turns == FirstTurn && c != Origin {
-		return ErrFirstPieceMustBeAtOrigin
+		return ErrRuleFirstPieceMustBeAtOrigin
 	}
 
 	// Is it this players turn to place a piece?
 	if p.Color() != g.turn {
-		return ErrNotPlayersTurn
+		return ErrRuleNotPlayersTurn
 	}
 
 	player := g.currentPlayer()
@@ -89,29 +89,29 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 
 	// Is this the fourth turn and has the currentPlayer placed their queen or is this piece their queen?
 	if g.turns == FourthTurn && player.HasQueen() {
-		return ErrMustPlaceQueen
+		return ErrRuleMustPlaceQueen
 	}
 
 	// Is this placement valid?
 	//     - Is it on the surface? (H == 0)
 	//     - Is it touching the opponents piece? (neighbors)
-	//     no ErrMustPlacePieceOnSurface
+	//     no ErrRuleMustPlacePieceOnSurface
 	if c.H() > 0 {
-		return ErrMustPlacePieceOnSurface
+		return ErrRuleMustPlacePieceOnSurface
 	}
 
 	if g.turns == FirstTurn && g.featureEnabled(TournamentQueensRuleFeature) && p.IsQueen() {
-		return ErrMayNotPlaceQueenOnFirstTurn
+		return ErrRuleMayNotPlaceQueenOnFirstTurn
 	} else if g.turns != FirstTurn {
 		// we must allow the players to place pieces that touch each other on the first turn, but never again.
 		if neighbors, _ := g.board.Neighbors(c); contactWithOpponentsPiece(p, neighbors) {
-			return ErrMayNotPlaceTouchingOpponentsPiece
+			return ErrRuleMayNotPlaceTouchingOpponentsPiece
 		}
 	}
 
 	// place the piece, we're not allowed to place two pieces at the same coordinate
 	if err := g.board.Place(p, c); err != nil {
-		return err
+		return ErrRuleMayNotPlaceAPieceOnAPiece
 	}
 
 	// update the history
@@ -142,26 +142,26 @@ func (g *Game) Move(a, b Coordinate) error {
 	player := g.currentPlayer()
 
 	// Is this currentPlayer allowed to move?
-	//     no: ErrNotPlayersTurn
+	//     no: ErrRuleNotPlayersTurn
 	if piece.Color() != g.turn {
-		return ErrNotPlayersTurn
+		return ErrRuleNotPlayersTurn
 	}
 
 	// Has this color placed their queen?
-	//     no: ErrMustPlaceQueenToMove
+	//     no: ErrRuleMustPlaceQueenToMove
 	if player.HasQueen() {
-		return ErrMustPlaceQueenToMove
+		return ErrRuleMustPlaceQueenToMove
 	}
 
 	// Is this piece allowed to move?
 	//     - Rule of sliding
 	//     - Paralyzed after Pill Bug action
 	//     - Breaking the hive
-	//     no: ErrPieceMayNotMove
+	//     no: ErrRulePieceParalyzed
 	// If the formation of the neighbors is pinning the piece at the specified coordinate
 	// then it may not move.
 	if neighbors, err := g.board.Neighbors(a); err == nil && Formation(neighbors).isPinned() {
-		return ErrPieceMayNotMove
+		return ErrRulePieceParalyzed
 	} else if err != nil {
 		// There isn't a piece at (a).
 		// TODO: ErrInvalidMove is way to vague here it failed for a reason the message doesn't announce
@@ -171,7 +171,7 @@ func (g *Game) Move(a, b Coordinate) error {
 
 	// if the piece is paralyzed the player can't move it
 	if g.pieceIsParalyzed(a) {
-		return ErrPieceMayNotMove
+		return ErrRulePieceParalyzed
 	}
 
 	// TODO: implement splitting hive on move
@@ -341,7 +341,7 @@ func (g *Game) pieceIsParalyzed(c Coordinate) bool {
 // used when a Pill Bug paralyzes a piece or itself
 func (g *Game) paralyzePiece(c Coordinate) error {
 	if _, ok := g.paralyzedPieces[c]; ok {
-		return ErrPieceAlreadyParalyzed
+		return ErrRulePieceAlreadyParalyzed
 	}
 	g.paralyzedPieces[c] = 1
 	return nil
@@ -419,21 +419,20 @@ const (
 	WhitePlayer Winner = 2
 )
 
-var ErrFirstPieceMustBeAtOrigin = fmt.Errorf("the first piece to be placed must be placed at origin")
 var ErrGameNotOver = fmt.Errorf("there isn't a declared winner as the game is not over")
 var ErrUnknownPiece = fmt.Errorf("an unknown piece was encountered")
-
-var ErrMustPlacePieceOnSurface = fmt.Errorf("a piece must be placed on the surface of the board")
-var ErrMayNotPlaceTouchingOpponentsPiece = fmt.Errorf("the player may not place a piece where it will touch an opponents piece after the first turn")
-
-var ErrMayNotPlaceQueenOnFirstTurn = fmt.Errorf("tournament rules: a player may not place their queen on the first turn")
-
 var ErrInvalidMove = fmt.Errorf("the specified move is invalid")
-var ErrPieceMayNotMove = fmt.Errorf("this piece may not move")
-var ErrNotPlayersTurn = fmt.Errorf("a player may only act on their turn")
-var ErrMustPlaceQueen = fmt.Errorf("the player must place their queen by the fourth turns")
-var ErrMustPlaceQueenToMove = fmt.Errorf("the players queen must be placed before a placed piece may move")
-var ErrPieceAlreadyParalyzed = fmt.Errorf("the piece is already paralyzed and may not be stunned again this turn")
+
+var ErrRuleFirstPieceMustBeAtOrigin = fmt.Errorf("the first piece to be placed must be placed at origin")
+var ErrRuleMayNotPlaceAPieceOnAPiece = fmt.Errorf("may not place a piece where another piece exists")
+var ErrRuleMustPlacePieceOnSurface = fmt.Errorf("a piece must be placed on the surface of the board")
+var ErrRulePieceParalyzed = fmt.Errorf("this piece is paralyzed and may not move")
+var ErrRuleMayNotPlaceTouchingOpponentsPiece = fmt.Errorf("the player may not place a piece where it will touch an opponents piece after the first turn")
+var ErrRuleMayNotPlaceQueenOnFirstTurn = fmt.Errorf("tournament rules: a player may not place their queen on the first turn")
+var ErrRuleNotPlayersTurn = fmt.Errorf("a player may only act on their turn")
+var ErrRuleMustPlaceQueen = fmt.Errorf("the player must place their queen by the fourth turns")
+var ErrRuleMustPlaceQueenToMove = fmt.Errorf("the players queen must be placed before a placed piece may move")
+var ErrRulePieceAlreadyParalyzed = fmt.Errorf("the piece is already paralyzed and may not be stunned again this turn")
 
 type Feature uint64
 
