@@ -430,7 +430,7 @@ type ErrUnknownBoardError struct {
 	Err error
 }
 func (e *ErrUnknownBoardError) Error() string {
-	return fmt.Sprintf("encountered unknown board error")
+	return fmt.Sprintf("encountered an unknown board error")
 }
 func (e *ErrUnknownBoardError) Unwrap() error { return e.Err }
 

@@ -1,1 +1,4 @@
 hived-*.so
+vendor
+_build
+go.sum
