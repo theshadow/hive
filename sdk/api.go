@@ -78,6 +78,6 @@ func init() {
 
 	ver := LibraryVersion()
 	if LibraryVersion() != EngineVersion {
-		panic(&ErrSDKVersionMismatch{ EngineVersion, ver})
+		panic(&ErrSDKVersionMismatch{ EngineVersion, ver })
 	}
 }
