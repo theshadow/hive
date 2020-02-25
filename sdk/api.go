@@ -26,7 +26,9 @@ func LibraryVersion() string {
 	return v.(string)
 }
 
-func NewGame(features []hived.Feature) (Game, error) {
+type Feature uint64
+
+func NewGame(features []Feature) (Game, error) {
 	fn, err := plug.Lookup("NewGame")
 	if err != nil {
 		return nil, &ErrSDKFunctionLookupFailed{
@@ -34,7 +36,12 @@ func NewGame(features []hived.Feature) (Game, error) {
 		}
 	}
 
-	return fn.(func(features []hived.Feature) (*hived.Game, error))(features)
+	var ftrs []hived.Feature
+	for _, f := range features {
+		ftrs = append(ftrs, hived.Feature(f))
+	}
+
+	return fn.(func(features []hived.Feature) (*hived.Game, error))(ftrs)
 }
 
 type ErrSDKFunctionLookupFailed struct {
