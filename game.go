@@ -1,6 +1,7 @@
 package hived
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -110,7 +111,7 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 	}
 
 	// place the piece, we're not allowed to place two pieces at the same coordinate
-	if err := g.board.Place(p, c); err == ErrPauliExclusionPrinciple {
+	if err := g.board.Place(p, c); errors.Is(err, ErrPauliExclusionPrinciple) {
 		return ErrRuleMayNotPlaceAPieceOnAPiece
 	} else if err != nil {
 		return &ErrUnknownBoardError{err}
