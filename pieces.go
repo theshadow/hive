@@ -2,26 +2,15 @@ package hived
 
 import "fmt"
 
-// TODO: How can I track what a mosquito was?
-// May want to redo the bit layout and move color
-// to being a bit and bug being 4-bits. That would
-// leave me enough bits for expansion and also enough
-// to use for "cloning" another bugs abilities by using
-// 4-bits to track what bug it was cloning.
-// TODO: Does this matter?
-// When you move a mosquito you lose your bug type and the
-// destination is validated before movement is allowed. Also
-// any bug with a positive height has to either be a beetle
-// or a mosquito acting as a beetle.
-/*
-    Color |  Bug   | Piece  | Unused
-  11111111|11111111|11111111|11111111
-*/
+//   Color |  Bug   | Piece  | Unused
+// 11111111|11111111|11111111|11111111
 type Piece uint32
 
 func NewPiece(color, bug, piece uint8) Piece {
 	var p Piece
-	(&p).Set(color, bug, piece)
+	p |= Piece(uint32(color) << 24)
+	p |= Piece(uint32(bug) << 16)
+	p |= Piece(uint32(piece) << 8)
 	return p
 }
 func NewBlackPiece(bug, piece uint8) Piece {
@@ -29,13 +18,6 @@ func NewBlackPiece(bug, piece uint8) Piece {
 }
 func NewWhitePiece(bug, piece uint8) Piece {
 	return NewPiece(WhiteColor, bug, piece)
-}
-
-// TODO: Deprecate all Set() functions. This is not idomatic go.
-func (p *Piece) Set(color, bug, piece uint8) {
-	*p |= Piece(uint32(color) << 24)
-	*p |= Piece(uint32(bug) << 16)
-	*p |= Piece(uint32(piece) << 8)
 }
 func (p Piece) IsWhite() bool {
 	return p.Color() == WhiteColor

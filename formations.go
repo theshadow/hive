@@ -58,9 +58,6 @@ package hived
 // we can simply create a map[int]int where the key is the decimal Location of the bitfield and the mapped to integer is
 // the type of formation, be it Chevron, Butterfly, or Spaceship.
 //
-// TODO: Can I create a linear function that when provided a formation in decimal form, that it can validate if its
-//       a part of the formation set? Would this be cheaper operationally?
-//
 type Formation [7]Piece
 
 func (f Formation) CanSlide() bool {
@@ -110,10 +107,10 @@ func (f Formation) bitField() (field int) {
 	// Once again Above has no value in this algorithm we just ignore it by starting
 	// from 5.
 	//
-	// TODO: Was this a poor idea to define them this way? I'm not sure. On the one hand
-	//       it makes this loop a little more complicated. On the other hand the order
-	//       feels natural to humans and the formations are kind of a human construct?
-	//       I dunno, I just code here.
+	// Was this a poor idea to define them this way? I'm not sure. On the one hand
+	// it makes this loop a little more complicated. On the other hand the order
+	// feels natural to humans and the formations are kind of a human construct?
+	// I dunno, I just code here.
 	for i, j := 5, 0; i >= 0; i, j = i-1, j+1 {
 		v := f[j]
 		if v == ZeroPiece {

@@ -31,8 +31,6 @@ type Game struct {
 	// current board state
 	board *Board
 
-	// TODO: Should the game know its history or should the session?
-	// each move for this game
 	history []Move
 
 	// Track the pieces that are paralyzed by mapping the location of the piece to a
@@ -191,9 +189,10 @@ func (g *Game) Move(a, b Coordinate) error {
 	}
 
 	// Move the piece
-	if err := g.board.Move(a, b); err != nil {
-		// TODO: perhaps wrap this? Does it matter? What context do I gain or lose?
-		return err
+	if err := g.board.Move(a, b); errors.Is(err, ErrPauliExclusionPrinciple) {
+		return ErrRuleMayNotPlaceAPieceOnAPiece
+	} else if err != nil {
+		return &ErrUnknownBoardError{err}
 	}
 
 	// update the history

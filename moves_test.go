@@ -3,14 +3,12 @@ package hived
 import "testing"
 
 func TestMove_Set(t *testing.T) {
-	var p Piece
-	(&p).Set(WhiteColor, Grasshopper, PieceC)
+	var p = NewPiece(WhiteColor, Grasshopper, PieceC)
 
 	src := NewCoordinate(2, 3, 4, 5)
 	dst := NewCoordinate(6, 7, 8, 9)
 
-	var m Move
-	(&m).Set(Moved, p, src, dst)
+	var m = NewMove(Moved, p, src, dst)
 
 	if m.Action() != Moved {
 		t.Logf("the expected action %s did not match the actual action %s", actionLabels[Moved], m.ActionS())

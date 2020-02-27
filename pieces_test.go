@@ -8,8 +8,7 @@ func TestPiece_Set(t *testing.T) {
 	pExpected |= Piece(uint32(Beetle) << 16)
 	pExpected |= Piece(uint32(PieceC) << 8)
 
-	var pActual Piece
-	(&pActual).Set(WhiteColor, Beetle, PieceC)
+	var pActual = NewPiece(WhiteColor, Beetle, PieceC)
 
 	if pExpected != pActual {
 		t.Logf("the expected piece %s did not match the actual piece %s", pExpected, pActual)

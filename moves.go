@@ -16,14 +16,14 @@ type Move struct {
 
 func NewMove(action uint8, p Piece, src Coordinate, dst Coordinate) Move {
 	var m Move
-	(&m).Set(action, p, src, dst)
-	return m
-}
-func (m *Move) Set(action uint8, p Piece, src Coordinate, dst Coordinate) {
 	m.action |= uint32(action) << 24
 	m.action |= uint32(p) >> 8
 	m.transition |= uint64(src) << 32
 	m.transition |= uint64(dst)
+	return m
+}
+func (m *Move) Set(action uint8, p Piece, src Coordinate, dst Coordinate) {
+
 }
 func (m Move) Piece() Piece {
 	return Piece(m.action << 8)
