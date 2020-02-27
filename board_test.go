@@ -62,7 +62,7 @@ func TestBoard_Move(t *testing.T) {
 
 // Test that Neighbors can return a piece on all sides
 //
-// Place a piece at origin and use the neighborsMatrix to place the pieces
+// Place a piece at origin and use the NeighborsMatrix to place the pieces
 // on all sides of the origin piece.
 //
 // Use Neighbors() to retrieve the neighbors from origin and then validate
@@ -90,7 +90,7 @@ func TestBoard_Neighbors(t *testing.T) {
 
 	// use the neighbors matrix to place each piece manually
 	for idx, op := range otherPieces {
-		coord := origin.Add(neighborsMatrix[idx])
+		coord := origin.Add(NeighborsMatrix[idx])
 		err := board.Place(op, coord)
 		if err != nil {
 			t.Logf("failed to place origin: %s location: %s error: %s", origin, coord, err)

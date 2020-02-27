@@ -7,7 +7,7 @@ import (
 func TestPlayer_HasZeroPieces(t *testing.T) {
 	var player Player
 	if !player.HasZeroPieces() {
-		t.Log("a zero-value player has pieces")
+		t.Log("a zero-Location player has pieces")
 		t.Fail()
 	}
 

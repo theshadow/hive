@@ -1,8 +1,10 @@
-package hived
+package game
 
 import (
 	"errors"
 	"fmt"
+
+	. "github.com/theshadow/hived"
 )
 
 // Game maintains the game instance state
@@ -34,17 +36,17 @@ type Game struct {
 	history []Move
 
 	// Track the pieces that are paralyzed by mapping the location of the piece to a
-	// time till free value. When the value is zero, the piece is removed from the map
+	// time till free Location. When the Location is zero, the piece is removed from the map
 	// and freed.
 	//
-	// After each turn the the value is decremented by one.
+	// After each turn the the Location is decremented by one.
 	paralyzedPieces map[Coordinate]int
 
 	// feature flags
 	features map[Feature]bool
 }
 
-func NewGame(features []Feature) *Game {
+func New(features []Feature) *Game {
 	featureMap := copyFeatureMap()
 	if features != nil {
 		for _, f := range features {
@@ -163,7 +165,7 @@ func (g *Game) Move(a, b Coordinate) error {
 	//     no: ErrRulePieceParalyzed
 	// If the formation of the neighbors is pinning the piece at the specified coordinate
 	// then it may not move.
-	if neighbors, err := g.board.Neighbors(a); err == nil && Formation(neighbors).isPinned() {
+	if neighbors, err := g.board.Neighbors(a); err == nil && Formation(neighbors).IsPinned() {
 		return ErrRulePieceParalyzed
 	} else if err != nil {
 		// There isn't a piece at (a).
@@ -184,24 +186,9 @@ func (g *Game) Move(a, b Coordinate) error {
 	// Is this move valid?
 	//     - Can this piece move to this location (pathing)
 	//     no: ErrInvalidMove
-
-	// TODO: How does ladybug movement work?
-	// Probably a modified path algorithm where any cell with a piece within a distance of
-	// 2 from the ladybug is considered to have a height of zero?
-	// TODO: How does pill bug movement work? Could these be implemented as custom path rules?
-	// What if part of the pathing rules allowed the bug to modify the terrain? None of
-	// the pieces have height limits for their movement so we could create a terrain
-	// mask that made the pathing algorithm see those cells as empty. Thus a lady
-	// bug can path over pieces. That might work, I think there are some edge cases.
-	//
-	// If A is a piece touching a pill bug / (mosquito:pill bug) of the right color
-	// and A is not paralyzed, and the pill bug / (mosquito:pill bug) is not paralyzed,
-	// and B is an empty cell. Move A to B and return nil.
-
-	// TODO: How does mosquito movement work? This may be another custom Move function,
-	//       can I generalize?
-	// If A is a mosquito, calculate for each bug type adjacent if B is a valid point
-	// in that pieces path algorithm move the piece return nil
+	if err := g.path(a, b, piece); err != nil {
+		return err
+	}
 
 	// Move the piece
 	if err := g.board.Move(a, b); err != nil {
@@ -350,7 +337,7 @@ func (g *Game) paralyzePiece(c Coordinate) error {
 	return nil
 }
 
-// When called decrements each paralyzed piece's Time-till-freed value by one.
+// When called decrements each paralyzed piece's Time-till-freed Location by one.
 // When the piece reaches zero, it is freed.
 func (g *Game) tickParalyzedPieces() {
 	// Time till Freed
@@ -366,6 +353,130 @@ func (g *Game) tickParalyzedPieces() {
 func (g *Game) featureEnabled(f Feature) bool {
 	_, ok := g.features[f]
 	return ok
+}
+
+// Attempt to path from a to b with piece p. Returns a slice of coordinates
+// that represents the discovered path.
+//
+// Uses the modified A* algorithm found at https://www.redblobgames.com/pathfinding/a-star/introduction.html
+// with additional rules specific for the game.
+//
+//
+// 1. Check if it's a climbing bug and if the distances from a to b is greater than allowed
+// 2. Attempt to discover a path to the destination
+// 3. Check if this is a bug with a range limit
+//
+// TODO: What if they path to a void?
+// TODO: What if they attempt to path through a space that would violate the rule of sliding?
+// TODO: How does ladybug movement work? Can only move TWO on top.
+// Probably a modified path algorithm where any cell with a piece within a distance of
+// 2 from the ladybug is considered to have a height of zero?
+// TODO: How does pill bug movement work? Could these be implemented as custom path rules?
+// What if part of the pathing rules allowed the bug to modify the terrain? None of
+// the pieces have height limits for their movement so we could create a terrain
+// mask that made the pathing algorithm see those cells as empty. Thus a lady
+// bug can path over pieces. That might work, I think there are some edge cases.
+// TODO: How does mosquito movement work? This may be another custom Move function,
+//       can I generalize?
+// If A is a mosquito, calculate for each bug type adjacent if B is a valid point
+// in that pieces path algorithm move the piece return nil
+//
+// If A is a piece touching a pill bug / (mosquito:pill bug) of the right color
+// and A is not paralyzed, and the pill bug / (mosquito:pill bug) is not paralyzed,
+// and B is an empty cell. Move A to B and return nil.
+// TODO: Potentially return the path as []Coordinate for rendering engines this would
+//   require making this an exported function receiver.
+func (g *Game) path(a, b Coordinate, p Piece) error {
+	dist := distance(a, b)
+
+	// is the distance to great for this piece? As beetles and ladybugs
+	// can climb on things we check if we can move to the destination
+	// ignoring the distance and cost checks.
+	if isClimber, bug := g.isBugThatClimbs(p, a); isClimber {
+		if bug == Beetle && dist > BeetleMaxDistance {
+			return ErrRuleMovementDistanceTooGreat
+		} else if bug == Ladybug && dist > LadybugMaxDistance {
+			return ErrRuleMovementDistanceTooGreat
+		}
+	}
+
+	// TODO: if piece is jumper (Grasshopper) calculate pathing for a straight line
+	// TODO: pill bug pathing??? path MUST route through pill bug?
+	// TODO: How does the rule of sliding work here?
+
+	frontier := make(PriorityQueue, 127)
+	costs := map[Coordinate]int{a: 0}
+	from := map[Coordinate]Coordinate{a: Origin}
+
+	for frontier.Len() > 0 {
+		current := frontier.Pop().(Coordinate)
+		if current == b {
+			break
+		}
+
+		for _, next := range neighbors(current) {
+			cost := costs[current] + g.movementCost(current, next, p)
+			// if not in the previous map or if the movementCost of moving to this location costs
+			// less than our current movementCost calculation fro this location then we will adjust
+			if _, fromOK, curCost, _ := idx(next, from, costs); !fromOK || cost < curCost {
+				costs[next] = cost
+				priority := cost + heuristic(b, next)
+				frontier.Push(&Item{
+					Location: next,
+					Priority: priority,
+				})
+				from[next] = current
+			}
+		}
+	}
+
+	// Check if the path is greater than the max distance for pieces
+	dist = len(from)
+	if p.IsQueen() && dist > QueenMaxDistance {
+		return ErrRuleMovementDistanceTooGreat
+	} else if p.IsSpider() && dist > SpiderMaxDistance {
+		return ErrRuleMovementDistanceTooGreat
+	} else if p.IsPillBug() && dist > PillBugMaxDistance {
+		return ErrRuleMovementDistanceTooGreat
+	}
+
+	return nil
+}
+
+func (g *Game) movementCost(a, b Coordinate, p Piece) int {
+	cost := distance(a, b)
+	// If there is a piece at b and
+	climber, _ := g.isBugThatClimbs(p, a)
+	if _, ok := g.board.Cell(b); ok && !climber {
+		cost *= 5
+	}
+	return cost
+}
+
+func (g *Game) isBugThatClimbs(p Piece, c Coordinate) (bool, uint8) {
+	if p.IsBeetle() {
+		return true, Beetle
+	} else if p.IsLadybug() {
+		return true, Ladybug
+	}
+
+	if neighbors, err := g.board.Neighbors(c); err != nil && p.IsMosquito() {
+		for _, piece := range neighbors {
+			if piece.IsLadybug() {
+				return true, Ladybug
+			} else if piece.IsBeetle() {
+				return true, Beetle
+			}
+		}
+	}
+
+	return false, NoBug
+}
+
+func idx(c Coordinate, fromM map[Coordinate]Coordinate, costM map[Coordinate]int) (Coordinate, bool, int, bool) {
+	a, aOK := fromM[c]
+	b, bOK := costM[c]
+	return a, aOK, b, bOK
 }
 
 func contactWithOpponentsPiece(p Piece, neighbors [7]Piece) bool {
@@ -429,44 +540,9 @@ var ErrInvalidMove = fmt.Errorf("the specified move is invalid")
 type ErrUnknownBoardError struct {
 	Err error
 }
+
 func (e *ErrUnknownBoardError) Error() string {
 	return fmt.Sprintf("encountered an unknown board error")
 }
 func (e *ErrUnknownBoardError) Unwrap() error { return e.Err }
 
-var ErrRuleFirstPieceMustBeAtOrigin = fmt.Errorf("the first piece to be placed must be placed at origin")
-var ErrRuleMayNotPlaceAPieceOnAPiece = fmt.Errorf("may not place a piece where another piece exists")
-var ErrRuleMustPlacePieceOnSurface = fmt.Errorf("a piece must be placed on the surface of the board")
-var ErrRulePieceParalyzed = fmt.Errorf("this piece is paralyzed and may not move")
-var ErrRuleMayNotPlaceTouchingOpponentsPiece = fmt.Errorf("the player may not place a piece where it will touch an opponents piece after the first turn")
-var ErrRuleMayNotPlaceQueenOnFirstTurn = fmt.Errorf("tournament rules: a player may not place their queen on the first turn")
-var ErrRuleNotPlayersTurn = fmt.Errorf("a player may only act on their turn")
-var ErrRuleMustPlaceQueen = fmt.Errorf("the player must place their queen by the fourth turns")
-var ErrRuleMustPlaceQueenToMove = fmt.Errorf("the players queen must be placed before a placed piece may move")
-var ErrRulePieceAlreadyParalyzed = fmt.Errorf("the piece is already paralyzed and may not be stunned again this turn")
-
-type Feature uint64
-
-const (
-	NoFeature Feature = iota
-	LadybugPieceFeature
-	PillBugPieceFeature
-	MosquitoPieceFeature
-
-	TournamentQueensRuleFeature
-)
-
-var featureMap = map[Feature]bool{
-	LadybugPieceFeature:         false,
-	PillBugPieceFeature:         false,
-	MosquitoPieceFeature:        false,
-	TournamentQueensRuleFeature: false,
-}
-
-func copyFeatureMap() (features map[Feature]bool) {
-	features = make(map[Feature]bool)
-	for k, v := range featureMap {
-		features[k] = v
-	}
-	return features
-}

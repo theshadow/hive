@@ -10,7 +10,7 @@ OUTPUT_ARCHIVE :=$(OUTPUT_PREFIX).zip
 LDFLAGS :=-ldflags "-X github.com/theshadow/hived.Version=$(VERSION) -X github.com/theshadow/hived.BuildID=$(BUILD)"
 
 all: static-analysis tests build
-.PHONY: build formatting static-analysis test _archive _artifacts _docs
+.PHONY: build formatting static-analysis test _archive _docs
 
 tests:
 	go test .../..
@@ -18,10 +18,10 @@ tests:
 static-analysis:
 	go vet .../..
 
-docker-container:
+docker-container: _formatting
 	docker build -t theshadow/hived .
 
-build: _artifacts _docs _archive
+build: _docs _archive
 
 tag:
 	git tag v$(VERSION)
@@ -29,17 +29,17 @@ tag:
 release:
 	hub create -a $(OUTPUT_ARCHIVE) $(BUILD)
 
+_formatting:
+	go fmt .../..
+
 _docs:
 	cd docs; sphinx-build -b html -D release=$(VERSION) . _build
 
 _archive:
 	mkdir -p _build/docs
-	cp cmd/library/$(OUTPUT_LIB) _build
 	cp --recursive docs/_build/* _build/docs
 	cp LICENSE _build
 	cp VERSION _build
 	cd _build; zip -r $(OUTPUT_ARCHIVE) .
 
-_artifacts:
-	cd cmd/library; go build -buildmode=plugin $(LDFLAGS) -o hived-$(VERSION).so .../..
 

@@ -2,22 +2,20 @@ package hived
 
 import "fmt"
 
-/* A currentPlayer tracks the color and remaining cells the currentPlayer has.
-
- . Unused
-(C)olor
-(Q)ueen
-(A)nt         x 3
-(G)rasshopper x 3
-(B)eetle      x 2
-(S)pider      x 2
-(M)osquito
-(L)adybug
-(P)ill Bug
-
-.CQA|AAGG|GBBS|SMLP
-1111|1111|1111|1111
-*/
+// A Player tracks the color and remaining cells the player has.
+//     . Unused
+//    (C)olor
+//    (Q)ueen
+//    (A)nt         x 3
+//    (G)rasshopper x 3
+//    (B)eetle      x 2
+//    (S)pider      x 2
+//    (M)osquito
+//    (L)adybug
+//    (P)ill Bug
+//
+//    .CQA|AAGG|GBBS|SMLP
+//    1111|1111|1111|1111
 type Player uint16
 
 func NewPlayer() (p Player) {
@@ -39,7 +37,7 @@ func (p Player) HasQueen() bool {
 	return (p & QueenMask) != 0
 }
 
-// Will return 3 or less for the count as there are only three ants per currentPlayer
+// Will return 3 or less for the count as there are only three ants per player
 func (p Player) Ants() (count int) {
 	n := int((p & AntsMask) >> 9)
 	for n > 0 {
@@ -49,7 +47,7 @@ func (p Player) Ants() (count int) {
 	return count
 }
 
-// Will return 3 or less for the count as there are only three grasshoppers per currentPlayer
+// Will return 3 or less for the count as there are only three grasshoppers per player
 func (p Player) Grasshoppers() (count int) {
 	n := int((p & GrasshoppersMask) >> 7)
 	for n > 0 {
@@ -59,7 +57,7 @@ func (p Player) Grasshoppers() (count int) {
 	return count
 }
 
-// Will return 2 or less for the count as there are only two beetles per currentPlayer
+// Will return 2 or less for the count as there are only two beetles per player
 func (p Player) Beetles() (count int) {
 	n := int((p & BeetlesMask) >> 5)
 	for n > 0 {
@@ -69,7 +67,7 @@ func (p Player) Beetles() (count int) {
 	return count
 }
 
-// Will return 2 or less for the count as there are only two spiders per currentPlayer
+// Will return 2 or less for the count as there are only two spiders per player
 func (p Player) Spiders() (count int) {
 	n := int((p & SpidersMask) >> 3)
 	for n > 0 {
@@ -88,18 +86,20 @@ func (p Player) HasPillBug() bool {
 	return ((p & PillBugMask) >> 0) != 0
 }
 
-/*
-	The Take* interface is the way you take a piece from a players inventory.
-	As we're treating a currentPlayer as a value type it is immutable without mucking with memory.
-	Instead we accept that currentPlayer is a value type and say that any modifications are made via
-	returning a modified version of the value.
-*/
+// The Take* interface is the way you take a piece from a players inventory.
+//	As we're treating a player as a Location type it is immutable without mucking with memory.
+//	Instead we accept that player is a Location type and say that any modifications are made via
+//	returning a modified version of the Location.
+
+// TakeQueen
 func (p Player) TakeQueen() (Player, error) {
 	if !p.HasQueen() {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 	return p | QueenMask, nil
 }
+
+// TakeAnAnt
 func (p Player) TakeAnAnt() (Player, error) {
 	if p.Ants() == 3 {
 		return p &^ AntABitMask, nil
@@ -111,6 +111,8 @@ func (p Player) TakeAnAnt() (Player, error) {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }
+
+// TakeAGrasshopper
 func (p Player) TakeAGrasshopper() (Player, error) {
 	if p.Grasshoppers() == 3 {
 		return p &^ GrasshopperAMask, nil
@@ -122,6 +124,8 @@ func (p Player) TakeAGrasshopper() (Player, error) {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }
+
+// TakeABeetle
 func (p Player) TakeABeetle() (Player, error) {
 	if p.Beetles() == 2 {
 		return p &^ BeetleAMask, nil
@@ -131,6 +135,8 @@ func (p Player) TakeABeetle() (Player, error) {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }
+
+// TakeASpider
 func (p Player) TakeASpider() (Player, error) {
 	if p.Spiders() == 2 {
 		return p &^ SpiderAMask, nil
@@ -140,24 +146,32 @@ func (p Player) TakeASpider() (Player, error) {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 }
+
+// TakeMosquito
 func (p Player) TakeMosquito() (Player, error) {
 	if !p.HasMosquito() {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 	return p &^ MosquitoMask, nil
 }
+
+// TakeLadyBug
 func (p Player) TakeLadybug() (Player, error) {
 	if !p.HasLadybug() {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 	return p &^ LadybugMask, nil
 }
+
+// TakePillBug
 func (p Player) TakePillBug() (Player, error) {
 	if !p.HasPillBug() {
 		return ZeroPlayer, ErrNoPieceAvailable
 	}
 	return p &^ PillBugMask, nil
 }
+
+// String
 func (p Player) String() string {
 	color := "White"
 	if p.IsBlack() {

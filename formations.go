@@ -54,8 +54,8 @@ package hived
 //
 // True to matrix math we can quickly identify that in each column all of the permutations contain reflections. That
 // is, "101010" is the mirror image of "010101". We may be able to use this information during our checks to reduce
-// the number of operations if we can find a cheap way to create the reflection of an integer value. If we can't I believe
-// we can simply create a map[int]int where the key is the decimal value of the bitfield and the mapped to integer is
+// the number of operations if we can find a cheap way to create the reflection of an integer Location. If we can't I believe
+// we can simply create a map[int]int where the key is the decimal Location of the bitfield and the mapped to integer is
 // the type of formation, be it Chevron, Butterfly, or Spaceship.
 //
 // TODO: Can I create a linear function that when provided a formation in decimal form, that it can validate if its
@@ -64,7 +64,7 @@ package hived
 type Formation [7]Piece
 
 func (f Formation) CanSlide() bool {
-	return f.isPinned()
+	return f.IsPinned()
 }
 func (f Formation) MaySplitHive() bool {
 	return f.inBrokenButterfly()
@@ -74,7 +74,7 @@ func (f Formation) MaySplitHive() bool {
 func (f Formation) inBrokenButterfly() bool {
 	return false
 }
-func (f Formation) isPinned() bool {
+func (f Formation) IsPinned() bool {
 	if f.contacts() >= 5 {
 		return true
 	}
@@ -98,7 +98,7 @@ func (f Formation) contacts() (count int) {
 
 // bitField returns the formation information encoded into an integer by
 // representing each contact point as a bit. This allows us to derive an
-// integer value for a given formation and use that to quickly determine
+// integer Location for a given formation and use that to quickly determine
 // if the current formation is one where the piece is pinned or not.
 func (f Formation) bitField() (field int) {
 	// i tracks which bit to set starting with the highest
@@ -107,7 +107,7 @@ func (f Formation) bitField() (field int) {
 	// j tracks the position in the Formation([7]Piece) array from the lowest element
 	// because we wrote the Neighbors function to store N from that point.
 	//
-	// Once again Above has no value in this algorithm we just ignore it by starting
+	// Once again Above has no Location in this algorithm we just ignore it by starting
 	// from 5.
 	//
 	// TODO: Was this a poor idea to define them this way? I'm not sure. On the one hand

@@ -1,6 +1,8 @@
 package hived
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Board represents a 4D hex grid (x, y, z, height). It works by storing
 // the contents of a hex coordinate ("cell") in a slice and using a map
@@ -26,7 +28,7 @@ func NewBoard() *Board {
 //
 // With this definition the board will return an error if there is already a piece at
 // the specified coordinate. This is due to the fact that I'm accepting a trade off.
-// While there is merit and value in creating a more robust board that can manage
+// While there is merit and Location in creating a more robust board that can manage
 // multiple pieces at a given location we will loose a valuable and in my opinion
 // cheap safety net that will help us validate game rules. Details about the
 // two arguments are outlined below.
@@ -45,8 +47,8 @@ func NewBoard() *Board {
 // pieces and deciding on a clear set of behavior when you Place or Move a piece
 // sounds like a daunting task and really not worth the effort.
 //
-// So, in conclusion, the value of making cells more robust at this juncture is
-// out stripped by the value of having a safety net.
+// So, in conclusion, the Location of making cells more robust at this juncture is
+// out stripped by the Location of having a safety net.
 func (brd *Board) Place(p Piece, c Coordinate) error {
 	if _, ok := brd.Cell(c); ok {
 		return ErrPauliExclusionPrinciple
@@ -58,8 +60,16 @@ func (brd *Board) Place(p Piece, c Coordinate) error {
 
 	return nil
 }
+
+// Move will accept a source (A) coordinate and a destination (B) coordinate
+// and attempt to move the piece to that location. It will return an error
+// if a piece doesn't exist at the source or if a piece does exists at the
+// destination.
 func (brd *Board) Move(a, b Coordinate) error {
 	if idx, ok := brd.locationMap[a]; ok {
+		if _, ok := brd.locationMap[b]; ok {
+			return ErrPauliExclusionPrinciple
+		}
 		// update the coordinate of the piece
 		brd.cells[idx].Coordinate = b
 		brd.locationMap[b] = idx
@@ -100,7 +110,7 @@ func (brd *Board) Neighbors(c Coordinate) (formation [7]Piece, err error) {
 		return formation, ErrInvalidCoordinate
 	}
 
-	for i, loc := range neighborsMatrix {
+	for i, loc := range NeighborsMatrix {
 		loc = c.Add(loc)
 		if p, ok := brd.Cell(loc); ok {
 			formation[i] = p
@@ -121,7 +131,7 @@ var Origin = Coordinate(0)
 var ErrInvalidCoordinate = fmt.Errorf("the specified coordinate is invalid")
 var ErrPauliExclusionPrinciple = fmt.Errorf("two pieces may not occupy the same coordinate")
 
-var neighborsMatrix = []Coordinate{
+var NeighborsMatrix = []Coordinate{
 	// North
 	NewCoordinate(0, 1, -1, 0),
 	// Northeast
