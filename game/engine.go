@@ -36,10 +36,10 @@ type Game struct {
 	history []Move
 
 	// Track the pieces that are paralyzed by mapping the location of the piece to a
-	// time till free Location. When the Location is zero, the piece is removed from the map
+	// time till free value. When the value is zero, the piece is removed from the map
 	// and freed.
 	//
-	// After each turn the the Location is decremented by one.
+	// After each turn the the value is decremented by one.
 	paralyzedPieces map[Coordinate]int
 
 	// feature flags
@@ -337,7 +337,7 @@ func (g *Game) paralyzePiece(c Coordinate) error {
 	return nil
 }
 
-// When called decrements each paralyzed piece's Time-till-freed Location by one.
+// When called decrements each paralyzed piece's Time-till-freed value by one.
 // When the piece reaches zero, it is freed.
 func (g *Game) tickParalyzedPieces() {
 	// Time till Freed

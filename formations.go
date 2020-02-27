@@ -98,7 +98,7 @@ func (f Formation) contacts() (count int) {
 
 // bitField returns the formation information encoded into an integer by
 // representing each contact point as a bit. This allows us to derive an
-// integer Location for a given formation and use that to quickly determine
+// integer value for a given formation and use that to quickly determine
 // if the current formation is one where the piece is pinned or not.
 func (f Formation) bitField() (field int) {
 	// i tracks which bit to set starting with the highest
@@ -107,7 +107,7 @@ func (f Formation) bitField() (field int) {
 	// j tracks the position in the Formation([7]Piece) array from the lowest element
 	// because we wrote the Neighbors function to store N from that point.
 	//
-	// Once again Above has no Location in this algorithm we just ignore it by starting
+	// Once again Above has no value in this algorithm we just ignore it by starting
 	// from 5.
 	//
 	// TODO: Was this a poor idea to define them this way? I'm not sure. On the one hand

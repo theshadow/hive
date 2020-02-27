@@ -28,7 +28,7 @@ func NewBoard() *Board {
 //
 // With this definition the board will return an error if there is already a piece at
 // the specified coordinate. This is due to the fact that I'm accepting a trade off.
-// While there is merit and Location in creating a more robust board that can manage
+// While there is merit and value in creating a more robust board that can manage
 // multiple pieces at a given location we will loose a valuable and in my opinion
 // cheap safety net that will help us validate game rules. Details about the
 // two arguments are outlined below.
@@ -47,8 +47,8 @@ func NewBoard() *Board {
 // pieces and deciding on a clear set of behavior when you Place or Move a piece
 // sounds like a daunting task and really not worth the effort.
 //
-// So, in conclusion, the Location of making cells more robust at this juncture is
-// out stripped by the Location of having a safety net.
+// So, in conclusion, the value of m	aking cells more robust at this juncture is
+// out stripped by the value of having a safety net.
 func (brd *Board) Place(p Piece, c Coordinate) error {
 	if _, ok := brd.Cell(c); ok {
 		return ErrPauliExclusionPrinciple

@@ -3,26 +3,26 @@ package game
 import (
 	"math"
 
-	"github.com/theshadow/hived"
+	. "github.com/theshadow/hived"
 )
 
 // Distance will return the Manhattan distance between two coordinates.
 // It does not validate if either coordinate is a cell with a valid piece
 // as it's mostly here for path algorithms
-func distance(a, b hived.Coordinate) int {
+func distance(a, b Coordinate) int {
 	return int(math.Round((math.Abs(float64(a.X()-b.X())) + math.Abs(float64(a.X()-b.X())) +
 		math.Abs(float64(a.X()-b.X()))) / 2))
 }
 
-func neighbors(c hived.Coordinate) []hived.Coordinate {
-	var neighbors []hived.Coordinate
-	for _, loc := range hived.NeighborsMatrix {
+func neighbors(c Coordinate) []Coordinate {
+	var neighbors []Coordinate
+	for _, loc := range NeighborsMatrix {
 		neighbors = append(neighbors, c.Add(loc))
 	}
 	return neighbors
 }
 
-func heuristic(a, b hived.Coordinate) int {
+func heuristic(a, b Coordinate) int {
 	return int(math.Round(math.Abs(float64(a.X()-b.X()))+
 		math.Abs(float64(a.Y()-b.Y()))))
 }
