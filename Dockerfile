@@ -14,10 +14,14 @@ ENV OPT_EDITOR=no
 RUN apt-get update && apt-get upgrade -y
 
 # Tools
-RUN apt-get install -y python-pip python-sphinx hub zip
+RUN apt-get install -y python-pip python-sphinx zip
 RUN go get github.com/readthedocs/godocjson
 
 # Libraries
 RUN pip install sphinx-autoapi sphinxcontrib-golangdomain
 
 RUN make
+
+FROM nginx:alpine
+
+COPY --from=build /go/src/github.com/theshadow/hived/_build/docs /usr/share/nginx/html

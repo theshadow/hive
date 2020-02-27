@@ -28,9 +28,9 @@ func heuristic(a, b Coordinate) int {
 }
 
 const (
-	BeetleMaxDistance  = 1
-	LadybugMaxDistance = 3
-	PillBugMaxDistance = 1
-	QueenMaxDistance   = 1
-	SpiderMaxDistance  = 3
+	beetleMaxDistance  = 1
+	ladybugMaxDistance = 3
+	pillBugMaxDistance = 1
+	queenMaxDistance   = 1
+	spiderMaxDistance  = 3
 )

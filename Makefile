@@ -26,9 +26,6 @@ build: _docs _archive
 tag:
 	git tag v$(VERSION)
 
-release:
-	hub create -a $(OUTPUT_ARCHIVE) $(BUILD)
-
 _formatting:
 	go fmt .../..
 

@@ -58,4 +58,4 @@ html_theme = 'alabaster'
 html_static_path = ['_static']
 
 autoapi_type = 'go'
-autoapi_dirs = ['..']
+autoapi_dirs = ['../game', '..']

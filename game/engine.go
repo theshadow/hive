@@ -392,9 +392,9 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 	// can climb on things we check if we can move to the destination
 	// ignoring the distance and cost checks.
 	if isClimber, bug := g.isBugThatClimbs(p, a); isClimber {
-		if bug == Beetle && dist > BeetleMaxDistance {
+		if bug == Beetle && dist > beetleMaxDistance {
 			return ErrRuleMovementDistanceTooGreat
-		} else if bug == Ladybug && dist > LadybugMaxDistance {
+		} else if bug == Ladybug && dist > ladybugMaxDistance {
 			return ErrRuleMovementDistanceTooGreat
 		}
 	}
@@ -431,11 +431,11 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 
 	// Check if the path is greater than the max distance for pieces
 	dist = len(from)
-	if p.IsQueen() && dist > QueenMaxDistance {
+	if p.IsQueen() && dist > queenMaxDistance {
 		return ErrRuleMovementDistanceTooGreat
-	} else if p.IsSpider() && dist > SpiderMaxDistance {
+	} else if p.IsSpider() && dist > spiderMaxDistance {
 		return ErrRuleMovementDistanceTooGreat
-	} else if p.IsPillBug() && dist > PillBugMaxDistance {
+	} else if p.IsPillBug() && dist > pillBugMaxDistance {
 		return ErrRuleMovementDistanceTooGreat
 	}
 

@@ -20,22 +20,16 @@ maintain these tools.
   - sphinx-autoapi
   - sphinxcontrib-golangdomain
 
-Building
---------
+Execute Tests and Build Documentation
+++++++++++++++++++++++++++++++++++++++
 
-The build target of the project is a shared library compiled into Go's plugin framework.
+The following command will execute all tests in the project, generate documentation, and start an
+nginx server on localhost:8080 that serves up that documentation.
 
-Local Build
-+++++++++++
+    make docs-server
 
-    make docker-container
-
-CICD Build
-+++++++++++
-
-You will need to ensure that all of the build environment tools are installed.
-
-    make
+Execute Tests and Build Documentation
+++++++++++++++++++++++++++++++++++++++
 
 Roadmap
 -------
