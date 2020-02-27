@@ -46,14 +46,17 @@ Roadmap
         * [-] Rule of the Single Hive
         * [X] Placement
         * [-] Movement
-            * [ ] Queen
-            * [ ] Ant
-            * [ ] Grasshopper
-            * [ ] Spider
-            * [ ] Beetle
-            * [ ] Ladybug
-            * [ ] Pillbug
-            * [ ] Mosquito
+            * [-] Queen
+            * [-] Ant
+            * [-] Grasshopper
+            * [-] Spider
+            * [-] Beetle
+            * [-] Ladybug
+            * [-] Pillbug
+            * [-] Mosquito
+            * [ ] Rule of Sliding
+            * [ ] Path to Void
+            * [ ] No path discovered
         * [X] Victory
     * [-] Feature Flags
         * [X] Tournament Rules
@@ -61,7 +64,7 @@ Roadmap
         * [-] Ladybug
         * [-] Mosquito
     * [X] Turn Management
-        * [ ] Track Turn History
+        * [X] Track Turn History
         * [X] Track paralyzed pieces
 * [ ] Project
     * [ ] Hosting
