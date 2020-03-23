@@ -16,9 +16,9 @@ type Game struct {
 	// tracks which players turn it is, WhiteColor or BlackColor.
 	turn uint8
 
-	// These track the state of each currentPlayer
-	white Player
-	black Player
+	// These track the state of each player
+	white *Player
+	black *Player
 
 	// Track the coordinate of each queen to quickly detect victory
 	// states without having to perform an O(n) over all pieces
@@ -26,12 +26,14 @@ type Game struct {
 	whiteQueen Coordinate
 	blackQueen Coordinate
 
+	// When true the game is determined to be a tie.
 	tie bool
 
-	// current board state
+	// Current board state
 	board *Board
 
-	history []Move
+	// A collection of moves is the history of the game.
+	history []Action
 
 	// Track the pieces that are paralyzed by mapping the location of the piece to a
 	// time till free value. When the value is zero, the piece is removed from the map
@@ -40,7 +42,8 @@ type Game struct {
 	// After each turn the the value is decremented by one.
 	paralyzedPieces map[Coordinate]int
 
-	// feature flags
+	// maps a Feature to a boolean. When the boolean is true the feature is
+	// enabled.
 	features map[Feature]bool
 }
 
@@ -57,7 +60,7 @@ func New(features []Feature) *Game {
 		white:           NewPlayer(),
 		black:           NewPlayer(),
 		board:           NewBoard(),
-		history:         []Move{},
+		history:         []Action{},
 		paralyzedPieces: make(map[Coordinate]int),
 		features:        featureMap,
 	}
@@ -118,7 +121,7 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 	}
 
 	// update the history
-	g.history = append(g.history, NewMove(Placed, p, 0, c))
+	g.history = append(g.history, NewAction(Placed, p, 0, c))
 
 	// turn management
 	if p.IsQueen() {
@@ -131,7 +134,7 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 }
 
 // TODO: Implement rules for movement
-// Move accepts two coordinates and attempts to move the piece found at (a) to (b).
+// Act accepts two coordinates and attempts to move the piece found at (a) to (b).
 // It will return an error if the movement violates any game rules or if the specified
 // coordinate for (a) is invalid.
 func (g *Game) Move(a, b Coordinate) error {
@@ -163,13 +166,8 @@ func (g *Game) Move(a, b Coordinate) error {
 	//     no: ErrRulePieceParalyzed
 	// If the formation of the neighbors is pinning the piece at the specified coordinate
 	// then it may not move.
-	if neighbors, err := g.board.Neighbors(a); err == nil && Formation(neighbors).IsPinned() {
+	if neighbors, _ := g.board.Neighbors(a); Formation(neighbors).IsPinned() {
 		return ErrRulePieceParalyzed
-	} else if err != nil {
-		// There isn't a piece at (a).
-		// TODO: ErrInvalidMove is way to vague here it failed for a reason the message doesn't announce
-		//  this is a concern. Context!
-		return ErrInvalidMove
 	}
 
 	// if the piece is paralyzed the player can't move it
@@ -188,7 +186,7 @@ func (g *Game) Move(a, b Coordinate) error {
 		return err
 	}
 
-	// Move the piece
+	// Act the piece
 	if err := g.board.Move(a, b); errors.Is(err, ErrPauliExclusionPrinciple) {
 		return ErrRuleMayNotPlaceAPieceOnAPiece
 	} else if err != nil {
@@ -196,7 +194,7 @@ func (g *Game) Move(a, b Coordinate) error {
 	}
 
 	// update the history
-	g.history = append(g.history, NewMove(Moved, piece, a, b))
+	g.history = append(g.history, NewAction(Moved, piece, a, b))
 
 	// turn management
 	if piece.IsQueen() {
@@ -211,22 +209,22 @@ func (g *Game) Move(a, b Coordinate) error {
 // this method will return an error.
 //
 // If there is a tie it will return a ZeroPlayer with a nil error.
-func (g *Game) Winner() (Player, error) {
+func (g *Game) Winner() (Winner, error) {
 	if !g.Over() {
-		return ZeroPlayer, ErrGameNotOver
+		return 0, ErrGameNotOver
 	}
 
 	if g.tie {
-		return ZeroPlayer, nil
+		return Tie, nil
 	}
 
 	// As we toggle the player at the end of a turn we determine
 	// the winner to be the person who the current player isn't.
-	var winner Player
+	var winner Winner
 	if !g.currentPlayer().IsWhite() {
-		winner = g.white
-	} else if !g.currentPlayer().IsBlack() {
-		winner = g.black
+		winner = WhitePlayer
+	} else {
+		winner = BlackPlayer
 	}
 
 	return winner, nil
@@ -280,7 +278,7 @@ func (g *Game) Over() bool {
 
 	return false
 }
-func (g *Game) History() []Move {
+func (g *Game) History() []Action {
 	return g.history
 }
 func (g *Game) updatePlayerQueen(c Coordinate) {
@@ -290,21 +288,29 @@ func (g *Game) updatePlayerQueen(c Coordinate) {
 		g.blackQueen = c
 	}
 }
-func (g *Game) takeAPiece(p Piece, player Player) error {
-	player, err := takeAPiece(p, g.currentPlayer())
-	if err != nil {
-		return err
+func (g *Game) takeAPiece(p Piece, player *Player) error {
+	if p.IsQueen() {
+		return player.TakeQueen()
+	} else if p.IsAnt() {
+		return player.TakeAnAnt()
+	} else if p.IsGrasshopper() {
+		return player.TakeAGrasshopper()
+	} else if p.IsSpider() {
+		return player.TakeASpider()
+	} else if p.IsBeetle() {
+		return player.TakeABeetle()
+	} else if p.IsLadybug() {
+		return player.TakeLadybug()
+	} else if p.IsMosquito() {
+		return player.TakeMosquito()
+	} else if p.IsPillBug() {
+		return player.TakePillBug()
 	}
-	if player.IsBlack() {
-		g.black = player
-	} else {
-		g.white = player
-	}
-	return nil
+	return ErrUnknownPiece
 }
 
-func (g *Game) currentPlayer() Player {
-	// figure out which currentPlayer we should be working with
+func (g *Game) currentPlayer() *Player {
+	// figure out which player we should be working with
 	if g.turn == WhiteColor {
 		return g.white
 	}
@@ -375,14 +381,14 @@ func (g *Game) featureEnabled(f Feature) bool {
 // the pieces have height limits for their movement so we could create a terrain
 // mask that made the pathing algorithm see those cells as empty. Thus a lady
 // bug can path over pieces. That might work, I think there are some edge cases.
-// TODO: How does mosquito movement work? This may be another custom Move function,
+// TODO: How does mosquito movement work? This may be another custom Act function,
 //       can I generalize?
 // If A is a mosquito, calculate for each bug type adjacent if B is a valid point
 // in that pieces path algorithm move the piece return nil
 //
 // If A is a piece touching a pill bug / (mosquito:pill bug) of the right color
 // and A is not paralyzed, and the pill bug / (mosquito:pill bug) is not paralyzed,
-// and B is an empty cell. Move A to B and return nil.
+// and B is an empty cell. Act A to B and return nil.
 // TODO: Potentially return the path as []Coordinate for rendering engines this would
 //   require making this an exported function receiver.
 func (g *Game) path(a, b Coordinate, p Piece) error {
@@ -391,16 +397,21 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 	// is the distance to great for this piece? As beetles and ladybugs
 	// can climb on things we check if we can move to the destination
 	// ignoring the distance and cost checks.
-	if isClimber, bug := g.isBugThatClimbs(p, a); isClimber {
-		if bug == Beetle && dist > beetleMaxDistance {
+	// We do this here as if the distance is too great we don't
+	// want to spend time on a pricey a* lookup.
+	if bug := g.pieceProfile(p, a); bug.IsClimber() {
+		if p.IsBeetle() && dist > beetleMaxDistance {
 			return ErrRuleMovementDistanceTooGreat
-		} else if bug == Ladybug && dist > ladybugMaxDistance {
+		} else if p.IsBeetle() && dist > ladybugMaxDistance {
 			return ErrRuleMovementDistanceTooGreat
 		}
 	}
 
 	// TODO: if piece is jumper (Grasshopper) calculate pathing for a straight line
 	// TODO: pill bug pathing??? path MUST route through pill bug?
+	//        1. A must be touching a pill bug of the current players color
+	//        2. The adjoining pill bug and the piece at A MUST NOT be paralyzed
+	//        3. B must be a valid empty cell that is also touching the same pill bug
 	// TODO: How does the rule of sliding work here?
 
 	frontier := make(PriorityQueue, 127)
@@ -416,7 +427,7 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 		for _, next := range neighbors(current) {
 			cost := costs[current] + g.movementCost(current, next, p)
 			// if not in the previous map or if the movementCost of moving to this location costs
-			// less than our current movementCost calculation fro this location then we will adjust
+			// less than our current movementCost calculation from this location then we will adjust
 			if _, fromOK, curCost, _ := idx(next, from, costs); !fromOK || cost < curCost {
 				costs[next] = cost
 				priority := cost + heuristic(b, next)
@@ -444,32 +455,38 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 
 func (g *Game) movementCost(a, b Coordinate, p Piece) int {
 	cost := distance(a, b)
-	// If there is a piece at b and
-	climber, _ := g.isBugThatClimbs(p, a)
-	if _, ok := g.board.Cell(b); ok && !climber {
+	// When there is a bug we modify the cost to make
+	// it too high for a* to consider unless the bug can climb
+	bug := g.pieceProfile(p, a)
+	if _, ok := g.board.Cell(b); ok && !bug.IsClimber() {
 		cost *= 5
 	}
 	return cost
 }
 
-func (g *Game) isBugThatClimbs(p Piece, c Coordinate) (bool, uint8) {
-	if p.IsBeetle() {
-		return true, Beetle
-	} else if p.IsLadybug() {
-		return true, Ladybug
-	}
 
-	if neighbors, err := g.board.Neighbors(c); err != nil && p.IsMosquito() {
+// Returns the profile of the supplied piece and coordinate
+func (g *Game) pieceProfile(p Piece, c Coordinate) profile {
+	var climber, jumper uint8
+
+	if p.IsMosquito() {
+		// neighbors only returns an error with an invalid coordinate,
+		// by this point we should definitely have a valid coordinate.
+		neighbors, _ := g.board.Neighbors(c)
 		for _, piece := range neighbors {
-			if piece.IsLadybug() {
-				return true, Ladybug
-			} else if piece.IsBeetle() {
-				return true, Beetle
+			if piece.IsLadybug() || piece.IsBeetle() {
+				climber &= Climber
+			} else if piece.IsGrasshopper() {
+				jumper &= Jumper
 			}
 		}
+	} else if p.IsBeetle() || p.IsLadybug(){
+		climber &= Climber
+	} else if p.IsGrasshopper() {
+		jumper &= Jumper
 	}
 
-	return false, NoBug
+	return profile(climber | jumper)
 }
 
 func idx(c Coordinate, fromM map[Coordinate]Coordinate, costM map[Coordinate]int) (Coordinate, bool, int, bool) {
@@ -500,27 +517,6 @@ func contactWithOpponentsPiece(p Piece, neighbors [7]Piece) bool {
 	return false
 }
 
-func takeAPiece(p Piece, player Player) (Player, error) {
-	if p.IsQueen() {
-		return player.TakeQueen()
-	} else if p.IsAnt() {
-		return player.TakeAnAnt()
-	} else if p.IsGrasshopper() {
-		return player.TakeAGrasshopper()
-	} else if p.IsSpider() {
-		return player.TakeASpider()
-	} else if p.IsBeetle() {
-		return player.TakeABeetle()
-	} else if p.IsLadybug() {
-		return player.TakeLadybug()
-	} else if p.IsMosquito() {
-		return player.TakeMosquito()
-	} else if p.IsPillBug() {
-		return player.TakePillBug()
-	}
-	return ZeroPlayer, ErrUnknownPiece
-}
-
 type Winner int
 
 const (
@@ -534,7 +530,6 @@ const (
 
 var ErrGameNotOver = fmt.Errorf("there isn't a declared winner as the game is not over")
 var ErrUnknownPiece = fmt.Errorf("an unknown piece was encountered")
-var ErrInvalidMove = fmt.Errorf("the specified move is invalid")
 
 type ErrUnknownBoardError struct {
 	Err error
@@ -544,4 +539,25 @@ func (e *ErrUnknownBoardError) Error() string {
 	return fmt.Sprintf("encountered an unknown board error")
 }
 func (e *ErrUnknownBoardError) Unwrap() error { return e.Err }
+
+// profile defines the behavior of a piece given a specified board state
+//
+//  J - Jumper
+//  C - Climber
+//
+//  ......JC
+//  11111111
+//   uint8
+type profile uint8
+func (p profile) IsClimber() bool {
+	return p & Climber > 0
+}
+func (p profile) IsJumper() bool {
+	return p & Jumper > 0
+}
+
+const (
+	Climber = 0b00000001
+	Jumper = 0b00000010
+)
 

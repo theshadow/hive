@@ -34,6 +34,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'autoapi.extension',
     'sphinxcontrib.golangdomain',
+    'sphinx.ext.todo'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

@@ -34,6 +34,11 @@ func TestBoard_Place(t *testing.T) {
 		t.Logf("Cell returned an unexpected piece")
 		t.Fail()
 	}
+
+	if err := board.Place(pieceC, cPieceC); err == nil {
+		t.Logf("expected place to return an ErrPauliExclusionPrinciple when trying to place a piece in a cell where a piece exists")
+		t.Fail()
+	}
 }
 
 func TestBoard_Move(t *testing.T) {
@@ -56,6 +61,14 @@ func TestBoard_Move(t *testing.T) {
 
 	if _, ok := board.Cell(cB); !ok {
 		t.Logf("found no piece at the destination coordinate")
+		t.Fail()
+	}
+
+	p = NewPiece(WhiteColor, Ant, PieceA)
+	cA = NewCoordinate(0, 0, 0, 0)
+	_ = board.Place(p, cA)
+	if err := board.Move(cA, cB); err == nil {
+		t.Logf("expected an ErrPauliExclusionPrinciple when trying to move a piece to a cell with a piece")
 		t.Fail()
 	}
 }

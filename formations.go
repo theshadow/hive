@@ -28,18 +28,20 @@ package hived
 // permutations. An easy way to imagine this is to treat the bitfield as a matrix that we'll be performing
 // operations against. Specifically we want to rotate the field through each of the available permutations.
 //
-// A permutation is defined as moving either the head or the tail of the matrix and to the opposite
+// A permutation is defined as moving either the first or the last element of the matrix and to the opposite
 // end of the matrix. See the functional-pseudo example below:
 //
-//  matrix = [ 1, 0, 1, 0, 1, 0 ]
-//  head   = f(matrix) -> int   = 1
-//  tail   = f(matrix) -> int   = 0
-//  body   = f(matrix) -> []int = [ 0, 1, 0, 1, 0 ]
+//  M = [ 1, 0, 1, 0, 1, 0 ]
+//
+//  first  = f(M) -> int   = 1
+//  last   = f(M) -> int   = 0
+//  head   = f(M) -> []int = [ 0, 1, 0, 1, 0 ]
+//  tail   = f(M) -> []int = [ 1, 0, 1, 0, 1 ]
 //
 //  ∴
 //
-//  lRotation = f(matrix) -> []int = body(matrix) + head(matrix) = [ 0, 1, 0, 1, 0, 1 ]
-//  rRotation = f(matrix) -> []int = tail(matrix) + body(matrix) = [ 0, 1, 0, 1, 0, 1 ]
+//  lRotation = f(M) -> []int = last(M) + head(M)  = [ 1, 0, 1, 0, 1, 0 ]
+//  rRotation = f(M) -> []int = tail(M) + first(M) = [ 0, 1, 0, 1, 0, 1 ]
 //
 //  By rotating each field through all of the permutations we can see the following options, numbers within parenthesis
 //  represent the decimal form of the matrix.

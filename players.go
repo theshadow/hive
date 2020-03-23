@@ -16,30 +16,29 @@ import "fmt"
 //
 //    .CQA|AAGG|GBBS|SMLP
 //    1111|1111|1111|1111
+// @TODO This should be a pointer type it maintains state that's updated.
 type Player uint16
 
-func NewPlayer() (p Player) {
-	// flip everything on and shift off the
-	// unused bit just to be consistent and tidy.
-	p = ^Player(0)
-	return p
+func NewPlayer() *Player {
+	p := ^Player(0)
+	return &p
 }
-func (p Player) HasZeroPieces() bool {
-	return (p << 2) == 0
+func (p *Player) HasZeroPieces() bool {
+	return (*p << 2) == 0
 }
-func (p Player) IsWhite() bool {
-	return (p & 0b0100000000000000) != 0
+func (p *Player) IsWhite() bool {
+	return (*p & 0b0100000000000000) != 0
 }
-func (p Player) IsBlack() bool {
-	return (p & 0b0100000000000000) == 0
+func (p *Player) IsBlack() bool {
+	return (*p & 0b0100000000000000) == 0
 }
-func (p Player) HasQueen() bool {
-	return (p & QueenMask) != 0
+func (p *Player) HasQueen() bool {
+	return (*p & QueenMask) != 0
 }
 
 // Will return 3 or less for the count as there are only three ants per player
-func (p Player) Ants() (count int) {
-	n := int((p & AntsMask) >> 9)
+func (p *Player) Ants() (count int) {
+	n := int((*p & AntsMask) >> 9)
 	for n > 0 {
 		count += n & 1
 		n >>= 1
@@ -48,8 +47,8 @@ func (p Player) Ants() (count int) {
 }
 
 // Will return 3 or less for the count as there are only three grasshoppers per player
-func (p Player) Grasshoppers() (count int) {
-	n := int((p & GrasshoppersMask) >> 7)
+func (p *Player) Grasshoppers() (count int) {
+	n := int((*p & GrasshoppersMask) >> 7)
 	for n > 0 {
 		count += n & 1
 		n >>= 1
@@ -58,8 +57,8 @@ func (p Player) Grasshoppers() (count int) {
 }
 
 // Will return 2 or less for the count as there are only two beetles per player
-func (p Player) Beetles() (count int) {
-	n := int((p & BeetlesMask) >> 5)
+func (p *Player) Beetles() (count int) {
+	n := int((*p & BeetlesMask) >> 5)
 	for n > 0 {
 		count += n & 1
 		n >>= 1
@@ -68,22 +67,22 @@ func (p Player) Beetles() (count int) {
 }
 
 // Will return 2 or less for the count as there are only two spiders per player
-func (p Player) Spiders() (count int) {
-	n := int((p & SpidersMask) >> 3)
+func (p *Player) Spiders() (count int) {
+	n := int((*p & SpidersMask) >> 3)
 	for n > 0 {
 		count += n & 1
 		n >>= 1
 	}
 	return count
 }
-func (p Player) HasMosquito() bool {
-	return ((p & MosquitoMask) >> 2) != 0
+func (p *Player) HasMosquito() bool {
+	return ((*p & MosquitoMask) >> 2) != 0
 }
-func (p Player) HasLadybug() bool {
-	return ((p & LadybugMask) >> 1) != 0
+func (p *Player) HasLadybug() bool {
+	return ((*p & LadybugMask) >> 1) != 0
 }
-func (p Player) HasPillBug() bool {
-	return ((p & PillBugMask) >> 0) != 0
+func (p *Player) HasPillBug() bool {
+	return ((*p & PillBugMask) >> 0) != 0
 }
 
 // The Take* interface is the way you take a piece from a players inventory.
@@ -92,87 +91,101 @@ func (p Player) HasPillBug() bool {
 //	returning a modified version of the Location.
 
 // TakeQueen
-func (p Player) TakeQueen() (Player, error) {
+func (p *Player) TakeQueen() error {
 	if !p.HasQueen() {
-		return ZeroPlayer, ErrNoPieceAvailable
+		return ErrNoPieceAvailable
 	}
-	return p | QueenMask, nil
+	*p |= QueenMask
+	return nil
 }
 
 // TakeAnAnt
-func (p Player) TakeAnAnt() (Player, error) {
+func (p *Player) TakeAnAnt() error {
 	if p.Ants() == 3 {
-		return p &^ AntABitMask, nil
+		*p &^= AntABitMask
+		return nil
 	} else if p.Ants() == 2 {
-		return p &^ AntBBitMask, nil
+		*p &^= AntBBitMask
+		return nil
 	} else if p.Ants() == 1 {
-		return p &^ AntCBitMask, nil
+		*p &^= AntCBitMask
+		return nil
 	} else {
-		return ZeroPlayer, ErrNoPieceAvailable
+		return ErrNoPieceAvailable
 	}
 }
 
 // TakeAGrasshopper
-func (p Player) TakeAGrasshopper() (Player, error) {
+func (p *Player) TakeAGrasshopper() error {
 	if p.Grasshoppers() == 3 {
-		return p &^ GrasshopperAMask, nil
+		*p &^= GrasshopperAMask
+		return nil
 	} else if p.Grasshoppers() == 2 {
-		return p &^ GrasshopperBMask, nil
+		*p &^= GrasshopperBMask
+		return nil
 	} else if p.Grasshoppers() == 1 {
-		return p &^ GrasshopperCMask, nil
+		*p &^= GrasshopperCMask
+		return nil
 	} else {
-		return ZeroPlayer, ErrNoPieceAvailable
+		return ErrNoPieceAvailable
 	}
 }
 
 // TakeABeetle
-func (p Player) TakeABeetle() (Player, error) {
+func (p *Player) TakeABeetle() error {
 	if p.Beetles() == 2 {
-		return p &^ BeetleAMask, nil
+		*p &^= BeetleAMask
+		return nil
 	} else if p.Beetles() == 1 {
-		return p &^ BeetleBMask, nil
+		*p &^= BeetleBMask
+		return nil
 	} else {
-		return ZeroPlayer, ErrNoPieceAvailable
+		return ErrNoPieceAvailable
 	}
 }
 
 // TakeASpider
-func (p Player) TakeASpider() (Player, error) {
+func (p *Player) TakeASpider() error {
 	if p.Spiders() == 2 {
-		return p &^ SpiderAMask, nil
+		*p &^= SpiderAMask
+		return nil
 	} else if p.Spiders() == 1 {
-		return p &^ SpiderBMask, nil
+		*p &^= SpiderBMask
+		return nil
 	} else {
-		return ZeroPlayer, ErrNoPieceAvailable
+		return ErrNoPieceAvailable
 	}
 }
 
 // TakeMosquito
-func (p Player) TakeMosquito() (Player, error) {
+func (p *Player) TakeMosquito() error {
 	if !p.HasMosquito() {
-		return ZeroPlayer, ErrNoPieceAvailable
+		return ErrNoPieceAvailable
 	}
-	return p &^ MosquitoMask, nil
+	*p &^= MosquitoMask
+	return nil
 }
 
 // TakeLadyBug
-func (p Player) TakeLadybug() (Player, error) {
+func (p *Player) TakeLadybug() error {
 	if !p.HasLadybug() {
-		return ZeroPlayer, ErrNoPieceAvailable
+		return ErrNoPieceAvailable
 	}
-	return p &^ LadybugMask, nil
+	*p &^= LadybugMask
+	return nil
 }
 
 // TakePillBug
-func (p Player) TakePillBug() (Player, error) {
+func (p *Player) TakePillBug() error {
 	if !p.HasPillBug() {
-		return ZeroPlayer, ErrNoPieceAvailable
+		return ErrNoPieceAvailable
 	}
-	return p &^ PillBugMask, nil
+	*p &^= PillBugMask
+	return nil
 }
 
 // String
-func (p Player) String() string {
+func (p *Player) String() string {
 	color := "White"
 	if p.IsBlack() {
 		color = "Black"

@@ -84,3 +84,5 @@ F.A.Q.
 
     1. How do I access the docker container after performing a build?
         * docker run -it theshadow/hived:latest /bin/bash
+    2. How do I start the localhost docks server
+        * docker run -p 8080:80 theshadow/hived:latest

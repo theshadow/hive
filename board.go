@@ -44,10 +44,10 @@ func NewBoard() *Board {
 // By returning an error I make validating game rules drastically more reliable as
 // the board will help guarantee the game rules don't do something stupid.
 // It also greatly simplifies the memory management of the type. Tracking multiple
-// pieces and deciding on a clear set of behavior when you Place or Move a piece
+// pieces and deciding on a clear set of behavior when you Place or Act a piece
 // sounds like a daunting task and really not worth the effort.
 //
-// So, in conclusion, the value of m	aking cells more robust at this juncture is
+// So, in conclusion, the value of making cells more robust at this juncture is
 // out stripped by the value of having a safety net.
 func (brd *Board) Place(p Piece, c Coordinate) error {
 	if _, ok := brd.Cell(c); ok {
@@ -61,7 +61,7 @@ func (brd *Board) Place(p Piece, c Coordinate) error {
 	return nil
 }
 
-// Move will accept a source (A) coordinate and a destination (B) coordinate
+// Act will accept a source (A) coordinate and a destination (B) coordinate
 // and attempt to move the piece to that location. It will return an error
 // if a piece doesn't exist at the source or if a piece does exists at the
 // destination.
@@ -151,6 +151,7 @@ var NeighborsMatrix = []Coordinate{
 
 // Represents a single cell of the hex grid. It's an internal type and shouldn't
 // be used elsewhere beyond the Board type
+// TODO move to internal
 type cell struct {
 	Piece      Piece
 	Coordinate Coordinate
