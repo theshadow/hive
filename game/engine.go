@@ -74,14 +74,14 @@ func New(features []Feature) *Game {
 // game rules or if the player does not have the piece to
 // place it will return an error.
 func (g *Game) Place(p Piece, c Coordinate) error {
-	// the first piece to be placed must be at origin
-	if g.turns == FirstTurn && c != Origin {
-		return ErrRuleFirstPieceMustBeAtOrigin
-	}
-
 	// Is it this players turn to place a piece?
 	if p.Color() != g.turn {
 		return ErrRuleNotPlayersTurn
+	}
+
+	// the first piece to be placed must be at origin
+	if g.turns == FirstTurn && g.turn == WhiteColor && c != Origin {
+		return ErrRuleFirstPieceMustBeAtOrigin
 	}
 
 	player := g.currentPlayer()
@@ -96,17 +96,19 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 		return ErrRuleMustPlaceQueen
 	}
 
-	// Is this placement valid?
-	//     - Is it on the surface? (H == 0)
-	//     - Is it touching the opponents piece? (neighbors)
-	//     no ErrRuleMustPlacePieceOnSurface
-	if c.H() > 0 {
+	// When placing a piece if the piece being placed is above the surface but there aren't pieces below it
+	// return an error
+	cc := NewCoordinate(c.X(), c.Y(), c.Z(), 0)
+	if _, existing := g.board.Cell(cc); !existing && c.H() > 0 {
 		return ErrRuleMustPlacePieceOnSurface
 	}
 
+	// If the feature flag for tournament rules is enabled then the first piece placed must not be a queen.
 	if g.turns == FirstTurn && g.featureEnabled(TournamentQueensRuleFeature) && p.IsQueen() {
 		return ErrRuleMayNotPlaceQueenOnFirstTurn
-	} else if g.turns != FirstTurn {
+	}
+
+	if g.turns != FirstTurn {
 		// we must allow the players to place pieces that touch each other on the first turn, but never again.
 		if neighbors, _ := g.board.Neighbors(c); contactWithOpponentsPiece(p, neighbors) {
 			return ErrRuleMayNotPlaceTouchingOpponentsPiece
@@ -356,8 +358,8 @@ func (g *Game) tickParalyzedPieces() {
 }
 
 func (g *Game) featureEnabled(f Feature) bool {
-	_, ok := g.features[f]
-	return ok
+	enabled, _ := g.features[f]
+	return enabled
 }
 
 // Attempt to path from a to b with piece p. Returns a slice of coordinates
@@ -496,20 +498,13 @@ func idx(c Coordinate, fromM map[Coordinate]Coordinate, costM map[Coordinate]int
 }
 
 func contactWithOpponentsPiece(p Piece, neighbors [7]Piece) bool {
-	color := NoColor
-	if p.Color() == WhiteColor {
-		color = BlackColor
-	} else {
-		color = WhiteColor
-	}
-
 	for _, n := range neighbors {
 		// don't care about zero pieces
 		if n == ZeroPiece {
 			continue
 		}
 
-		if n.Color() == color {
+		if n.Color() != p.Color() {
 			return true
 		}
 	}

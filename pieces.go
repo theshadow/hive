@@ -77,7 +77,7 @@ func (p Piece) PieceS() string {
 	return pieceLabels[p.Piece()]
 }
 func (p Piece) String() string {
-	return fmt.Sprintf("Color: %s, Bug: %s, Cell: %s", p.ColorS(), p.BugS(), p.PieceS())
+	return fmt.Sprintf("Color: %s, Bug: %s, Piece: %s", p.ColorS(), p.BugS(), p.PieceS())
 }
 
 const (
@@ -110,10 +110,10 @@ const (
 var ZeroPiece = Piece(0)
 
 var pieceLabels = []string{
-	"No Cell",
-	"Cell A",
-	"Cell B",
-	"Cell C",
+	"No Piece",
+	"Piece A",
+	"Piece B",
+	"Piece C",
 }
 
 var colorLabels = []string{
