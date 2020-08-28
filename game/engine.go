@@ -175,6 +175,7 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrRulePieceParalyzed
 	}
 
+	// TODO turn this rule check into a feature flag
 	// if the piece is paralyzed the player can't move it
 	if g.pieceIsParalyzed(a) {
 		return ErrRulePieceParalyzed
