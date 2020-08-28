@@ -9,13 +9,13 @@ func TestFormation_CanSlide(t *testing.T) {
 func TestFormation_IsPinned(t *testing.T) {
 	t.Log("When there is a piece above in the formation the result is a boolean TRUE value.")
 	formation := Formation{
-		ZeroPiece,                         // N
-		ZeroPiece,                         // NE
-		ZeroPiece,                         // SE
-		ZeroPiece,                         // S
-		ZeroPiece,                         // SW
-		ZeroPiece,                         // NW
-		NewPiece(BlackColor, Ant, PieceA), // A
+		ZeroPiece,
+		ZeroPiece,
+		ZeroPiece,
+		ZeroPiece,
+		ZeroPiece,
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceA),
 	}
 
 	if !formation.IsPinned() {
@@ -25,13 +25,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Chevron A a boolean TRUE value is returned.")
 	formation = Formation{
-		ZeroPiece,                         // N
-		NewPiece(BlackColor, Ant, PieceA), // NE
-		ZeroPiece,                         // SE
-		NewPiece(BlackColor, Ant, PieceB), // S
-		ZeroPiece,                         // SW
-		NewPiece(BlackColor, Ant, PieceC), // NW
-		ZeroPiece,                         // A
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceA),
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceB),
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceC),
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Chevron A.")
@@ -40,13 +40,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Chevron B a boolean TRUE value is returned.")
 	formation = Formation{
-		NewPiece(BlackColor, Ant, PieceA), // NE
-		ZeroPiece,                         // N
-		NewPiece(BlackColor, Ant, PieceB), // S
-		ZeroPiece,                         // SE
-		NewPiece(BlackColor, Ant, PieceC), // NW
-		ZeroPiece,                         // SW
-		ZeroPiece,                         // A
+		NewPiece(BlackColor, Ant, PieceA),
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceB),
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceC),
+		ZeroPiece,
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Chevron B.")
@@ -55,13 +55,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Spaceship A a boolean TRUE value is returned.")
 	formation = Formation{
-		ZeroPiece,                            // N
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		ZeroPiece,                            // SE
-		NewPiece(BlackColor, Ant, PieceB),    // S
-		NewPiece(BlackColor, Ant, PieceC),    // NW
-		NewPiece(BlackColor, Spider, PieceA), // SW
-		ZeroPiece,                            // A
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceA),
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceB),
+		NewPiece(BlackColor, Ant, PieceC),
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Spaceship A.")
@@ -70,13 +70,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Spaceship B a boolean TRUE value is returned.")
 	formation = Formation{
-		ZeroPiece,                            // N
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		NewPiece(BlackColor, Ant, PieceB),    // S
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceA),
+		NewPiece(BlackColor, Ant, PieceB),
 		NewPiece(BlackColor, Ant, PieceC),
-		ZeroPiece,                            // SE
-		NewPiece(BlackColor, Spider, PieceA), // SW
-		ZeroPiece,                            // A
+		ZeroPiece,
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Spaceship B.")
@@ -85,13 +85,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Spaceship C a boolean TRUE value is returned.")
 	formation = Formation{
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		ZeroPiece,                            // N
-		NewPiece(BlackColor, Ant, PieceB),    // S
+		NewPiece(BlackColor, Ant, PieceA),
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceB),
 		ZeroPiece,
 		NewPiece(BlackColor, Ant, PieceC),
-		NewPiece(BlackColor, Spider, PieceA), // SW
-		ZeroPiece,                            // A
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Spaceship C.")
@@ -100,13 +100,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Spaceship D a boolean TRUE value is returned.")
 	formation = Formation{
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		ZeroPiece,                            // N
-		NewPiece(BlackColor, Ant, PieceB),    // S
-		NewPiece(BlackColor, Ant, PieceC),
-		NewPiece(BlackColor, Spider, PieceA), // SW
+		NewPiece(BlackColor, Ant, PieceA),
 		ZeroPiece,
-		ZeroPiece,                            // A
+		NewPiece(BlackColor, Ant, PieceB),
+		NewPiece(BlackColor, Ant, PieceC),
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Spaceship D.")
@@ -115,13 +115,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Spaceship E a boolean TRUE value is returned.")
 	formation = Formation{
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		NewPiece(BlackColor, Ant, PieceB),    // S
-		ZeroPiece,                            // N
+		NewPiece(BlackColor, Ant, PieceA),
+		NewPiece(BlackColor, Ant, PieceB),
+		ZeroPiece,
 		NewPiece(BlackColor, Ant, PieceC),
 		ZeroPiece,
-		NewPiece(BlackColor, Spider, PieceA), // SW
-		ZeroPiece,                            // A
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Spaceship E.")
@@ -130,13 +130,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Spaceship F a boolean TRUE value is returned.")
 	formation = Formation{
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		NewPiece(BlackColor, Ant, PieceB),    // S
+		NewPiece(BlackColor, Ant, PieceA),
+		NewPiece(BlackColor, Ant, PieceB),
 		NewPiece(BlackColor, Ant, PieceC),
-		ZeroPiece,                            // N
-		NewPiece(BlackColor, Spider, PieceA), // SW
 		ZeroPiece,
-		ZeroPiece,                            // A
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Spaceship F.")
@@ -145,13 +145,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Butterfly A a boolean TRUE value is returned.")
 	formation = Formation{
-		ZeroPiece,                            // N
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		NewPiece(BlackColor, Ant, PieceB),    // S
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceA),
+		NewPiece(BlackColor, Ant, PieceB),
 		ZeroPiece,
 		NewPiece(BlackColor, Ant, PieceC),
-		NewPiece(BlackColor, Spider, PieceA), // SW
-		ZeroPiece,                            // A
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Butterfly A.")
@@ -160,13 +160,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Butterfly B a boolean TRUE value is returned.")
 	formation = Formation{
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		ZeroPiece,                            // N
-		NewPiece(BlackColor, Ant, PieceB),    // S
+		NewPiece(BlackColor, Ant, PieceA),
+		ZeroPiece,
+		NewPiece(BlackColor, Ant, PieceB),
 		NewPiece(BlackColor, Ant, PieceC),
 		ZeroPiece,
-		NewPiece(BlackColor, Spider, PieceA), // SW
-		ZeroPiece,                            // A
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Butterfly B.")
@@ -175,13 +175,13 @@ func TestFormation_IsPinned(t *testing.T) {
 
 	t.Log("When the formation is in a Butterfly C a boolean TRUE value is returned.")
 	formation = Formation{
-		NewPiece(BlackColor, Ant, PieceA),    // NE
-		NewPiece(BlackColor, Ant, PieceB),    // S
-		ZeroPiece,                            // N
-		NewPiece(BlackColor, Ant, PieceC),
-		NewPiece(BlackColor, Spider, PieceA), // SW
+		NewPiece(BlackColor, Ant, PieceA),
+		NewPiece(BlackColor, Ant, PieceB),
 		ZeroPiece,
-		ZeroPiece,                            // A
+		NewPiece(BlackColor, Ant, PieceC),
+		NewPiece(BlackColor, Spider, PieceA),
+		ZeroPiece,
+		ZeroPiece,
 	}
 	if !formation.IsPinned() {
 		t.Logf("Expected a boolean TRUE value when the formation is in Butterfly C.")
