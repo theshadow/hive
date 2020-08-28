@@ -196,7 +196,7 @@ func (g *Game) Move(a, b Coordinate) error {
 	}
 
 	// update the history
-	g.history = append(g.history, NewAction(Moved, piece, a, b))
+	g.history = append(g.history, NewAction(Placed, piece, a, b))
 
 	// turn management
 	if piece.IsQueen() {
@@ -280,9 +280,16 @@ func (g *Game) Over() bool {
 
 	return false
 }
-func (g *Game) History() []Action {
-	return g.history
+
+// History will populate the supplied slice with a copy of the
+// actions performed for this game instance.
+func (g *Game) History() (history []Action) {
+	for _, e := range g.history{
+		history = append(history, e)
+	}
+	return history
 }
+
 func (g *Game) updatePlayerQueen(c Coordinate) {
 	if g.currentPlayer().IsWhite() {
 		g.whiteQueen = c

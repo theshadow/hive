@@ -20,8 +20,8 @@ func TestGame_Place(t *testing.T) {
 		if !errors.Is(err, ErrRuleNotPlayersTurn) {
 			t.Logf("Unexpected error received, expected %#v, instead received %#v.",
 				ErrRuleNotPlayersTurn, err)
+			t.Fail()
 		}
-		t.Fail()
 	}
 
 	t.Log("When the first piece is not placed at origin an error is returned.")
@@ -36,8 +36,8 @@ func TestGame_Place(t *testing.T) {
 		if !errors.Is(err, ErrRuleFirstPieceMustBeAtOrigin) {
 			t.Logf("Unexpected error received, expected %#v, instead received %#v.",
 				ErrRuleFirstPieceMustBeAtOrigin, err)
+			t.Fail()
 		}
-		t.Fail()
 	}
 
 	t.Log("When a player places a piece and they do not have that piece available an error is returned.")
@@ -81,8 +81,8 @@ func TestGame_Place(t *testing.T) {
 		if !errors.Is(err, ErrRuleMustPlaceQueen) {
 			t.Logf("Unexpected error received, expected %#v, instead received %#v.",
 				ErrRuleMustPlaceQueen, err)
+			t.Fail()
 		}
-		t.Fail()
 	}
 
 	t.Log("When placing a piece above the surface and no pieces exist below an error is returned.")
@@ -106,6 +106,7 @@ func TestGame_Place(t *testing.T) {
 		if !errors.Is(err, ErrRuleMustPlacePieceOnSurface) {
 			t.Logf("Unexpected error received, expected %#v, instead received %#v.",
 				ErrRuleMustPlacePieceOnSurface, err)
+			t.Fail()
 		}
 	}
 
@@ -121,9 +122,11 @@ func TestGame_Place(t *testing.T) {
 		if !errors.Is(err, ErrRuleMayNotPlaceQueenOnFirstTurn) {
 			t.Logf("Unexpected error received, expected %#v, instead received %#v.",
 				ErrRuleMayNotPlaceQueenOnFirstTurn, err)
+			t.Fail()
 		}
-		t.Fail()
 	}
+
+	/////////////////////////////////////////////////////
 
 	t.Log("When placing a piece after the first turn, placing a piece touching an opponents piece returns an error.")
 	g = New(nil)
@@ -142,7 +145,6 @@ func TestGame_Place(t *testing.T) {
 		t.Fail()
 	}
 
-	// TODO This test case is failing because the neighbors are all ZeroPiece
 	p = hived.NewPiece(hived.WhiteColor, hived.Ant, hived.PieceA)
 	coord = hived.NewCoordinate(1, 0, -1, 0)
 	if err := g.Place(p, coord); err == nil {
@@ -158,3 +160,34 @@ func TestGame_Place(t *testing.T) {
 	}
 }
 
+func TestGame_Move(t *testing.T) {
+
+}
+
+func TestGame_History(t *testing.T) {
+
+	// TODO come back and update the test after move is tested.
+	t.Log("When requesting a copy of the game instance history all expected actions are returned")
+	g := New(nil)
+
+	p := hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
+	coord := hived.NewCoordinate(0, 0, 0, 0)
+	if err := g.Place(p, coord); err != nil {
+		t.Logf("Unexpected error %#v while white was placing a piece", err)
+		t.Fail()
+	}
+
+	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
+	coord = hived.NewCoordinate(1, -1, 0, 0)
+	if err := g.Place(p, coord); err != nil {
+		t.Logf("Unexpected error %#v while black was placing a piece", err)
+		t.Fail()
+	}
+
+	actions := g.History()
+
+	if len(actions) != 2 {
+		t.Logf("Expected there to be 2 actions instead received %d", len(actions))
+		t.Fail()
+	}
+}

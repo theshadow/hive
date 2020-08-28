@@ -16,7 +16,6 @@ import "fmt"
 //
 //    .CQA|AAGG|GBBS|SMLP
 //    1111|1111|1111|1111
-// @TODO This should be a pointer type it maintains state that's updated.
 type Player uint16
 
 func NewPlayer() *Player {
