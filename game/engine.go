@@ -146,11 +146,15 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrInvalidCoordinate
 	}
 
+	// todo add a check about moving a piece back to the same coordinate
+	if a == b {
+		return ErrInvalidCoordinate
+	}
+
 	// figure out which player we should be working with
 	player := g.currentPlayer()
 
 	// Is this currentPlayer allowed to move?
-	//     no: ErrRuleNotPlayersTurn
 	if piece.Color() != g.turn {
 		return ErrRuleNotPlayersTurn
 	}

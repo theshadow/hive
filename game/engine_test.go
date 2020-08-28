@@ -161,6 +161,104 @@ func TestGame_Place(t *testing.T) {
 }
 
 func TestGame_Move(t *testing.T) {
+	t.Log("When moving attempting to move a non-existing piece from an empty cell an error is returned.")
+	g := New(nil)
+
+	if err := g.Move(hived.Origin, hived.Origin); err == nil {
+		t.Log("Expected an error when attempting to move a piece that doesn't exist.")
+		t.Fail()
+	} else {
+		t.Log("When attempting to move a piece from an empty cell the expected error is returned.")
+		if !errors.Is(err, hived.ErrInvalidCoordinate) {
+			t.Logf("Expected an error of type %#v instead received %#v.", hived.ErrInvalidCoordinate, err)
+			t.Fail()
+		}
+	}
+
+	t.Log("When attempting to move a piece and the destination coordinate is the same as the source an error is returned.")
+	g = New(nil)
+	p := hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
+	if err := g.Place(p, hived.Origin); err != nil {
+		t.Logf("Unexpected error %#v while white was placing a piece", err)
+		t.Fail()
+	}
+
+	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
+	coord := hived.NewCoordinate(1, -1, 0, 0)
+	if err := g.Place(p, coord); err != nil {
+		t.Logf("Unexpected error %#v while black was placing a piece", err)
+		t.Fail()
+	}
+
+	if err := g.Move(hived.Origin, hived.Origin); err == nil {
+		t.Log("When attempting to move a piece from the origin to the origin an error was expected")
+		t.Fail()
+	} else {
+		t.Log("When attempting to move a piece from origin to the origin the expected error is returned.")
+		if !errors.Is(err, hived.ErrInvalidCoordinate) {
+			t.Logf("Expected an error of type %#v instead received %#v.", hived.ErrInvalidCoordinate, err)
+			t.Fail()
+		}
+	}
+
+	t.Log("When attempting to move an opponents piece an error is returned.")
+	g = New(nil)
+
+	p = hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
+	if err := g.Place(p, hived.Origin); err != nil {
+		t.Logf("Unexpected error %#v while white was placing a piece", err)
+		t.Fail()
+	}
+
+	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
+	coord = hived.NewCoordinate(1, -1, 0, 0)
+	if err := g.Place(p, coord); err != nil {
+		t.Logf("Unexpected error %#v while black was placing a piece", err)
+		t.Fail()
+	}
+
+	if err := g.Move(coord, hived.NewCoordinate(0, -1, 1, 0)); err == nil {
+		t.Log("Expected an error to be returned when white attempted to move one of blacks pieces.")
+		t.Fail()
+	} else {
+		t.Log("When attempting to move an opponents piece the expected error is returned.")
+		if !errors.Is(err, ErrRuleNotPlayersTurn) {
+			t.Logf("Expected an error of type %#v instead received %#v.", ErrRuleNotPlayersTurn, err)
+			t.Fail()
+		}
+	}
+
+	t.Log("When attempting to move a piece without having placed their queen an error is returned.")
+	g = New(nil)
+
+	p = hived.NewPiece(hived.WhiteColor, hived.Ant, hived.PieceA)
+	if err := g.Place(p, hived.Origin); err != nil {
+		t.Logf("Unexpected error %#v while white was placing a piece", err)
+		t.Fail()
+	}
+
+	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
+	coord = hived.NewCoordinate(1, -1, 0, 0)
+	if err := g.Place(p, coord); err != nil {
+		t.Logf("Unexpected error %#v while black was placing a piece", err)
+		t.Fail()
+	}
+
+	if err := g.Move(hived.Origin, hived.NewCoordinate(0, -1, 1, 0)); err == nil {
+		t.Log("Expected an error to be returned when white attempted to move a piece without placing their queen.")
+		t.Fail()
+	} else {
+		t.Log("When attempting to move a piece without first having placed their queen the expected error is returned.")
+		if !errors.Is(err, ErrRuleMustPlaceQueenToMove) {
+			t.Logf("Expected an error of type %#v instead received %#v.", ErrRuleMustPlaceQueenToMove, err)
+			t.Fail()
+		}
+	}
+
+	// TODO When attempting to move a piece that is pinned that an error is returned
+	// TODO When attempting to move a piece that is paralyzed an error is returned
+	// TODO When attempting to move a piece that woulld split the hivhe an error is returned
+	// TODO When attempting to move a piece not following the pieces pathing rules an error is returned
 
 }
 
