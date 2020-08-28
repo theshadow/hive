@@ -67,7 +67,6 @@ func New(features []Feature) *Game {
 
 }
 
-// TODO: Test this function
 // Place will accept a piece and a coordinate and attempt
 // to place it on the board at the specified coordinate
 // if the specified coordinate is an invalid space due to
@@ -146,7 +145,7 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrInvalidCoordinate
 	}
 
-	// todo add a check about moving a piece back to the same coordinate
+	// check that the source and destination aren't the same
 	if a == b {
 		return ErrInvalidCoordinate
 	}
@@ -292,6 +291,14 @@ func (g *Game) History() (history []Action) {
 		history = append(history, e)
 	}
 	return history
+}
+
+func (g *Game) UnmarshalJSON([]byte) error {
+	return nil
+}
+
+func (g *Game) MarshalJSON() ([]byte, error) {
+	return nil, nil
 }
 
 func (g *Game) updatePlayerQueen(c Coordinate) {

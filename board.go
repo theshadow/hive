@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// TODO how do I marshall this type
 // Board represents a 4D hex grid (x, y, z, height). It works by storing
 // the contents of a hex coordinate ("cell") in a slice and using a map
 // to quickly reference the memory.
