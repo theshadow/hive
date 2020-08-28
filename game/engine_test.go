@@ -255,7 +255,9 @@ func TestGame_Move(t *testing.T) {
 		}
 	}
 
-	// TODO When attempting to move a piece that is pinned that an error is returned
+
+
+	// TODO When attempting to move a piece that is pinned an error is returned
 	// TODO When attempting to move a piece that is paralyzed an error is returned
 	// TODO When attempting to move a piece that would split the hive an error is returned
 	// TODO When attempting to move a piece not following the pieces pathing rules an error is returned
