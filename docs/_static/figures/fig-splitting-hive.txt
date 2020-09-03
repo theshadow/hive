@@ -58,7 +58,7 @@ are two layouts we're interested in as any other rotation would result in the sa
 pattern. For the sake of clarity these formations will be enumerated alphabetically
 starting from 'A'. We discover these formations by forcing the N side to have a piece.
 
-Fig. Broken Butterfly A (bitwise annotation: 101100)
+Fig. Broken Butterfly (bitwise annotation: 10110000)
          _____         _____         _____
         /     \       /     \       /     \
   _____/       \_____/   O   \_____/       \_____
@@ -76,7 +76,7 @@ Fig. Broken Butterfly A (bitwise annotation: 101100)
  \_____/       \_____/       \_____/       \_____/
 
 
- Fig. Broken Butterfly B (bitwise annotation: 100110)
+ Fig. Broken Butterfly Reflection (bitwise annotation: 10011000)
           _____         _____         _____
          /     \       /     \       /     \
    _____/       \_____/   O   \_____/       \_____
@@ -95,7 +95,7 @@ Fig. Broken Butterfly A (bitwise annotation: 101100)
 
 ** Caterpillar
 
-  Fig. Caterpillar Straight (bitwise annotation: 100100)
+  Fig. Caterpillar Straight (bitwise annotation: 10010000)
            _____         _____         _____
           /     \       /     \       /     \
     _____/       \_____/   O   \_____/       \_____
@@ -113,7 +113,7 @@ Fig. Broken Butterfly A (bitwise annotation: 101100)
    \_____/       \_____/       \_____/       \_____/
 
 
-   Fig. Caterpillar Angled (bitwise annotation: 100010)
+   Fig. Caterpillar Angled (bitwise annotation: 10001000)
             _____         _____         _____
            /     \       /     \       /     \
      _____/       \_____/   O   \_____/       \_____
@@ -130,7 +130,7 @@ Fig. Broken Butterfly A (bitwise annotation: 101100)
    \       /     \       /     \       /     \       /
     \_____/       \_____/       \_____/       \_____/
 
-   Fig. Caterpillar Reflected Angled (bitwise annotation: 101000)
+   Fig. Caterpillar Angled Reflected (bitwise annotation: 10100000)
             _____         _____         _____
            /     \       /     \       /     \
      _____/       \_____/   O   \_____/       \_____
