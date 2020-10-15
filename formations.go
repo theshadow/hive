@@ -63,21 +63,14 @@ package hived
 type Formation [7]Piece
 
 func (f Formation) CanSlide() bool {
-	return f.IsPinned()
-}
-func (f Formation) MaySplitHive() bool {
-	return f.inBrokenButterfly()
+	return !f.IsPinned()
 }
 
-// TODO: Make this function work.
-func (f Formation) inBrokenButterfly() bool {
-	return false
-}
 func (f Formation) IsPinned() bool {
-	if f.contacts() >= 5 {
+	if f.above() != ZeroPiece {
 		return true
 	}
-	if f.above() != ZeroPiece {
+	if f.contacts() >= 5 {
 		return true
 	}
 	return isPinned(f.bitField())
@@ -143,7 +136,7 @@ func isPinned(formation int) bool {
 // Internal map used to detect specific formations.
 var formationMap = map[int]int{
 	// Chevron
-	20: Chevron,
+	21: Chevron,
 	42: Chevron,
 
 	// Spaceship

@@ -13,7 +13,8 @@ all: static-analysis tests build
 .PHONY: build formatting static-analysis test _archive _docs
 
 tests:
-	go test .../..
+	go test -test.v .../..
+	go test -test.v ./game/
 
 static-analysis:
 	go vet .../..

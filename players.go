@@ -16,7 +16,6 @@ import "fmt"
 //
 //    .CQA|AAGG|GBBS|SMLP
 //    1111|1111|1111|1111
-// @TODO This should be a pointer type it maintains state that's updated.
 type Player uint16
 
 func NewPlayer() *Player {
@@ -90,12 +89,13 @@ func (p *Player) HasPillBug() bool {
 //	Instead we accept that player is a Location type and say that any modifications are made via
 //	returning a modified version of the Location.
 
+// TODO double check the take-interface tests
 // TakeQueen
 func (p *Player) TakeQueen() error {
 	if !p.HasQueen() {
 		return ErrNoPieceAvailable
 	}
-	*p |= QueenMask
+	*p &^= QueenMask
 	return nil
 }
 
@@ -213,13 +213,13 @@ const (
 	AntBBitMask = 0b0000100000000000
 	AntCBitMask = 0b0000010000000000
 
-	GrasshopperAMask = 0b0000100000000000
-	GrasshopperBMask = 0b0000010000000000
-	GrasshopperCMask = 0b0000001000000000
+	GrasshopperAMask = 0b0000001000000000
+	GrasshopperBMask = 0b0000000100000000
+	GrasshopperCMask = 0b0000000010000000
 
-	BeetleAMask = 0b0000010000000000
-	BeetleBMask = 0b0000001000000000
+	BeetleAMask = 0b0000000001000000
+	BeetleBMask = 0b0000000000100000
 
-	SpiderAMask = 0b0000001000000000
-	SpiderBMask = 0b0000000100000000
+	SpiderAMask = 0b0000000000010000
+	SpiderBMask = 0b0000000000001000
 )

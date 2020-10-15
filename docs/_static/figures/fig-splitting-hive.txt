@@ -42,3 +42,107 @@ All pieces in contact with the moving piece can't path to each other. There is a
 /       \_____/       \_____/       \_____/       \
 \       /     \       /     \       /     \       /
  \_____/       \_____/       \_____/       \_____/
+
+
+* Collection of formations that _may_ result in a split
+
+In the following formations we focus on the arrangements that have the highest
+likelihood of having a split. If the O pieces outlined in the figure have a
+connection off scene then it is no longer considered a split.
+
+** Broken Butterfly
+
+This formation is like the Butterfly (a.k.a. Tie Fighter) formation except there
+are only three pieces surrounding the piece in question. In this formation there
+are two layouts we're interested in as any other rotation would result in the same
+pattern. For the sake of clarity these formations will be enumerated alphabetically
+starting from 'A'. We discover these formations by forcing the N side to have a piece.
+
+Fig. Broken Butterfly (bitwise annotation: 10110000)
+         _____         _____         _____
+        /     \       /     \       /     \
+  _____/       \_____/   O   \_____/       \_____
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/   X   \_____/       \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/   O   \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/   O   \_____/       \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/       \_____/       \_____/
+
+
+ Fig. Broken Butterfly Reflection (bitwise annotation: 10011000)
+          _____         _____         _____
+         /     \       /     \       /     \
+   _____/       \_____/   O   \_____/       \_____
+  /     \       /     \       /     \       /     \
+ /       \_____/       \_____/       \_____/       \
+ \       /     \       /     \       /     \       /
+  \_____/       \_____/   X   \_____/       \_____/
+  /     \       /     \       /     \       /     \
+ /       \_____/   O   \_____/       \_____/       \
+ \       /     \       /     \       /     \       /
+  \_____/       \_____/   O   \_____/       \_____/
+  /     \       /     \       /     \       /     \
+ /       \_____/       \_____/       \_____/       \
+ \       /     \       /     \       /     \       /
+  \_____/       \_____/       \_____/       \_____/
+
+** Caterpillar
+
+  Fig. Caterpillar Straight (bitwise annotation: 10010000)
+           _____         _____         _____
+          /     \       /     \       /     \
+    _____/       \_____/   O   \_____/       \_____
+   /     \       /     \       /     \       /     \
+  /       \_____/       \_____/       \_____/       \
+  \       /     \       /     \       /     \       /
+   \_____/       \_____/   X   \_____/       \_____/
+   /     \       /     \       /     \       /     \
+  /       \_____/       \_____/       \_____/       \
+  \       /     \       /     \       /     \       /
+   \_____/       \_____/   O   \_____/       \_____/
+   /     \       /     \       /     \       /     \
+  /       \_____/       \_____/       \_____/       \
+  \       /     \       /     \       /     \       /
+   \_____/       \_____/       \_____/       \_____/
+
+
+   Fig. Caterpillar Angled (bitwise annotation: 10001000)
+            _____         _____         _____
+           /     \       /     \       /     \
+     _____/       \_____/   O   \_____/       \_____
+    /     \       /     \       /     \       /     \
+   /       \_____/       \_____/       \_____/       \
+   \       /     \       /     \       /     \       /
+    \_____/       \_____/   X   \_____/       \_____/
+    /     \       /     \       /     \       /     \
+   /       \_____/   O   \_____/       \_____/       \
+   \       /     \       /     \       /     \       /
+    \_____/       \_____/       \_____/       \_____/
+    /     \       /     \       /     \       /     \
+   /       \_____/       \_____/       \_____/       \
+   \       /     \       /     \       /     \       /
+    \_____/       \_____/       \_____/       \_____/
+
+   Fig. Caterpillar Angled Reflected (bitwise annotation: 10100000)
+            _____         _____         _____
+           /     \       /     \       /     \
+     _____/       \_____/   O   \_____/       \_____
+    /     \       /     \       /     \       /     \
+   /       \_____/       \_____/       \_____/       \
+   \       /     \       /     \       /     \       /
+    \_____/       \_____/   X   \_____/       \_____/
+    /     \       /     \       /     \       /     \
+   /       \_____/       \_____/   O   \_____/       \
+   \       /     \       /     \       /     \       /
+    \_____/       \_____/       \_____/       \_____/
+    /     \       /     \       /     \       /     \
+   /       \_____/       \_____/       \_____/       \
+   \       /     \       /     \       /     \       /
+    \_____/       \_____/       \_____/       \_____/
