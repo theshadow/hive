@@ -13,4 +13,3 @@ var ErrRuleMustPlaceQueen = fmt.Errorf("the player must place their queen by the
 var ErrRuleMustPlaceQueenToMove = fmt.Errorf("the players queen must be placed before a placed piece may move")
 var ErrRulePieceAlreadyParalyzed = fmt.Errorf("the piece is already paralyzed and may not be stunned again this turn")
 var ErrRuleMovementDistanceTooGreat = fmt.Errorf("the distance for the movement is too great for this piece")
-

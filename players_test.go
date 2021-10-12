@@ -194,7 +194,7 @@ func TestPlayer_TakeQueen(t *testing.T) {
 	if err := p.TakeQueen(); p.HasQueen() || err == nil {
 		t.Log("Expected an error while taking an queen from a player without a queen.")
 		t.Fail()
-	} else if ! errors.Is(err, ErrNoPieceAvailable) {
+	} else if !errors.Is(err, ErrNoPieceAvailable) {
 		t.Logf("Exepceted an error of type %#v instead received %#v", ErrNoPieceAvailable, err)
 	}
 }
@@ -220,7 +220,7 @@ func TestPlayer_TakeLadybug(t *testing.T) {
 	if err := p.TakeLadybug(); p.HasLadybug() || err == nil {
 		t.Log("Expected an error while taking an ladybug from a player without a ladybug.")
 		t.Fail()
-	} else if ! errors.Is(err, ErrNoPieceAvailable) {
+	} else if !errors.Is(err, ErrNoPieceAvailable) {
 		t.Logf("Exepceted an error of type %#v instead received %#v", ErrNoPieceAvailable, err)
 	}
 }
@@ -246,7 +246,7 @@ func TestPlayer_TakeMosquito(t *testing.T) {
 	if err := p.TakeMosquito(); p.HasMosquito() || err == nil {
 		t.Log("Expected an error while taking an mosquito from a player without a mosquito.")
 		t.Fail()
-	} else if ! errors.Is(err, ErrNoPieceAvailable) {
+	} else if !errors.Is(err, ErrNoPieceAvailable) {
 		t.Logf("Exepceted an error of type %#v instead received %#v", ErrNoPieceAvailable, err)
 	}
 }
@@ -272,8 +272,7 @@ func TestPlayer_TakePillBug(t *testing.T) {
 	if err := p.TakePillBug(); p.HasPillBug() || err == nil {
 		t.Log("Expected an error while taking an pill bug from a player without a pill bug.")
 		t.Fail()
-	} else if ! errors.Is(err, ErrNoPieceAvailable) {
+	} else if !errors.Is(err, ErrNoPieceAvailable) {
 		t.Logf("Exepceted an error of type %#v instead received %#v", ErrNoPieceAvailable, err)
 	}
 }
-

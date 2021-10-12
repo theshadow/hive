@@ -43,5 +43,5 @@ Rule Errors
 
 Returned when either a Place or a Move action violates a rule of the game. For more information see
 the rules file. These errors should be very specific and clear when compared to the rules of the game.
- */
+*/
 package game

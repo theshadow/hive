@@ -23,7 +23,7 @@ func neighbors(c Coordinate) []Coordinate {
 }
 
 func heuristic(a, b Coordinate) int {
-	return int(math.Round(math.Abs(float64(a.X()-b.X()))+
+	return int(math.Round(math.Abs(float64(a.X()-b.X())) +
 		math.Abs(float64(a.Y()-b.Y()))))
 }
 
