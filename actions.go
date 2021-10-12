@@ -2,14 +2,16 @@ package hived
 
 import "fmt"
 
-/*
-   | Act    |          Piece           |
-   |11111111|11111111|11111111|11111111|
-
-   |                              Transition                               |
-   |        Source Coordinate         |          Dst Coordinate            |
-   |11111111|11111111|11111111|11111111|11111111|11111111|11111111|11111111|
-*/
+// Action is a type that represents performing an action in the game. It models what the action was in the act type
+// where the type of action and which Piece is stored. It also models where the piece moved from and to using a
+// transition which stores the source Coordinate and Destination coordinate in an uint64.
+//
+//| Act    |          Piece           |
+//|11111111|11111111|11111111|11111111|
+//
+//|                              Transition                               |
+//|        Source Coordinate         |          Dst Coordinate            |
+//|11111111|11111111|11111111|11111111|11111111|11111111|11111111|11111111|
 type Action struct {
 	act        uint32
 	transition uint64

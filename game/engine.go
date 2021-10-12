@@ -39,7 +39,7 @@ type Game struct {
 	// time till free value. When the value is zero, the piece is removed from the map
 	// and freed.
 	//
-	// After each turn the the value is decremented by one.
+	// After each turn the value is decremented by one.
 	paralyzedPieces map[Coordinate]int
 
 	// maps a Feature to a boolean. When the boolean is true the feature is
@@ -67,11 +67,23 @@ func New(features []Feature) *Game {
 
 }
 
-// Place will accept a piece and a coordinate and attempt
-// to place it on the board at the specified coordinate
-// if the specified coordinate is an invalid space due to
-// game rules or if the player does not have the piece to
+// Place will accept a piece and a coordinate and attempt to place it on the board at the specified coordinate
+// if the specified coordinate is an invalid space due to game rules or if the player does not have the piece to
 // place it will return an error.
+//
+// Rules Checked
+// - If the piece being placed belongs to the current player
+// - If this is the first turn the piece must be placed at the origin of the board.
+// - If the player can take the piece from their inventory
+// - If it's the fourth turn the player needs to be place their queen
+// - If the placement of the piece is on valid surface (no hovering)
+// - If it's not the first turn that the paced piece is not in contact with an opponents piece.
+// - If there is a piece where this piece is attempting to be placed at.
+//
+// Once the placement has been validating it will update the state of the history. Also note that if the piece moved was
+// a queen piece the location of that piece for that player will be updated.
+//
+// Finally, the function will toggle whose turn it is.
 func (g *Game) Place(p Piece, c Coordinate) error {
 	// Is it this players turn to place a piece?
 	if p.Color() != g.turn {
@@ -90,14 +102,19 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 		return err
 	}
 
-	// Is this the fourth turn and has the currentPlayer placed their queen or is this piece their queen?
-	if g.turns == FourthTurn && player.HasQueen() {
+	// If it is the fourth turn and the player has a queen in their inventory and the piece being placed is not a queen
+	// then the player must place a queen.
+	if g.turns == FourthTurn && player.HasQueen() && !p.IsQueen() {
 		return ErrRuleMustPlaceQueen
 	}
 
-	// When placing a piece if the piece being placed is above the surface but there aren't pieces below it
-	// return an error
-	cc := NewCoordinate(c.X(), c.Y(), c.Z(), 0)
+	// If where the piece is being placed is above the surface of the board and there isn't a piece below the the piece
+	// then this is an invalid move.
+	var h int8
+	if c.H() > 0 {
+		h--
+	}
+	cc := NewCoordinate(c.X(), c.Y(), c.Z(), h)
 	if _, existing := g.board.Cell(cc); !existing && c.H() > 0 {
 		return ErrRuleMustPlacePieceOnSurface
 	}
@@ -107,6 +124,7 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 		return ErrRuleMayNotPlaceQueenOnFirstTurn
 	}
 
+	// Validate that every piece placed after the first turn is not in contact with an opponents piece.
 	if g.turns != FirstTurn {
 		// we must allow the players to place pieces that touch each other on the first turn, but never again.
 		if neighbors, _ := g.board.Neighbors(c); contactWithOpponentsPiece(p, neighbors) {
@@ -134,10 +152,10 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 	return nil
 }
 
-// TODO: Implement rules for movement
-// Act accepts two coordinates and attempts to move the piece found at (a) to (b).
+// Move accepts two coordinates and attempts to move the piece found at (a) to (b).
 // It will return an error if the movement violates any game rules or if the specified
 // coordinate for (a) is invalid.
+// TODO: Implement rules for movement
 func (g *Game) Move(a, b Coordinate) error {
 	// Is this a valid piece to move?
 	piece, ok := g.board.Cell(a)
@@ -145,7 +163,7 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrInvalidCoordinate
 	}
 
-	// check that the source and destination aren't the same
+	// Verify that the source and destination are not at the same coordinate
 	if a == b {
 		return ErrInvalidCoordinate
 	}
@@ -158,8 +176,7 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrRuleNotPlayersTurn
 	}
 
-	// Has this color placed their queen?
-	//     no: ErrRuleMustPlaceQueenToMove
+	// If the player hasn't placed their queen they cannot move a piece
 	if player.HasQueen() {
 		return ErrRuleMustPlaceQueenToMove
 	}
@@ -175,9 +192,8 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrRulePieceParalyzed
 	}
 
-	// TODO turn this rule check into a feature flag
 	// if the piece is paralyzed the player can't move it
-	if g.pieceIsParalyzed(a) {
+	if g.featureEnabled(PillBugPieceFeature) && g.pieceIsParalyzed(a) {
 		return ErrRulePieceParalyzed
 	}
 
@@ -236,7 +252,7 @@ func (g *Game) Winner() (Winner, error) {
 	return winner, nil
 }
 
-// If either player has a suffocating queen then the game is over.
+// Over If either player has a suffocating queen then the game is over.
 func (g *Game) Over() bool {
 	// if both players have their queen then the game is not over.
 	if g.black.HasQueen() && g.white.HasQueen() {
@@ -288,7 +304,7 @@ func (g *Game) Over() bool {
 // History will populate the supplied slice with a copy of the
 // actions performed for this game instance.
 func (g *Game) History() (history []Action) {
-	for _, e := range g.history{
+	for _, e := range g.history {
 		history = append(history, e)
 	}
 	return history
@@ -420,10 +436,11 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 	// ignoring the distance and cost checks.
 	// We do this here as if the distance is too great we don't
 	// want to spend time on a pricey a* lookup.
+	// TODO should I group all of the distance checks together. Determine if order is important for this check.
 	if bug := g.pieceProfile(p, a); bug.IsClimber() {
 		if p.IsBeetle() && dist > beetleMaxDistance {
 			return ErrRuleMovementDistanceTooGreat
-		} else if p.IsBeetle() && dist > ladybugMaxDistance {
+		} else if p.IsLadybug() && dist > ladybugMaxDistance {
 			return ErrRuleMovementDistanceTooGreat
 		}
 	}
@@ -485,7 +502,6 @@ func (g *Game) movementCost(a, b Coordinate, p Piece) int {
 	return cost
 }
 
-
 // Returns the profile of the supplied piece and coordinate
 func (g *Game) pieceProfile(p Piece, c Coordinate) profile {
 	var climber, jumper uint8
@@ -501,7 +517,7 @@ func (g *Game) pieceProfile(p Piece, c Coordinate) profile {
 				jumper &= Jumper
 			}
 		}
-	} else if p.IsBeetle() || p.IsLadybug(){
+	} else if p.IsBeetle() || p.IsLadybug() {
 		climber &= Climber
 	} else if p.IsGrasshopper() {
 		jumper &= Jumper
@@ -563,15 +579,15 @@ func (e *ErrUnknownBoardError) Unwrap() error { return e.Err }
 //  11111111
 //   uint8
 type profile uint8
+
 func (p profile) IsClimber() bool {
-	return p & Climber > 0
+	return p&Climber > 0
 }
 func (p profile) IsJumper() bool {
-	return p & Jumper > 0
+	return p&Jumper > 0
 }
 
 const (
 	Climber = 0b00000001
-	Jumper = 0b00000010
+	Jumper  = 0b00000010
 )
-

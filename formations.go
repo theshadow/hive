@@ -1,7 +1,7 @@
 package hived
 
-// Used to track the neighbors around a piece. Specifically adds functionality for quickly validating
-// position of pieces around a center piece
+// Formation types are used to track the neighbors around a piece. Specifically adds functionality for quickly
+// validating position of pieces around a center piece.
 //
 // Detecting Specific Formations
 //
@@ -62,10 +62,18 @@ package hived
 //
 type Formation [7]Piece
 
+// CanSlide returns a true value if the piece isn't pinned.
 func (f Formation) CanSlide() bool {
 	return !f.IsPinned()
 }
 
+// IsPinned returns a true value when the piece is considered pinned and false otherwise. The rules that describe if a
+// piece is pinned are outlined as such where a true value if any of the following rules are true:
+//
+// - When this piece has a piece on top of it
+// - When this piece is in contact with five or more pieces
+// - If the formation of the neighbors in contact with this piece are in a Formation that would pin the piece
+//
 func (f Formation) IsPinned() bool {
 	if f.above() != ZeroPiece {
 		return true
@@ -76,9 +84,8 @@ func (f Formation) IsPinned() bool {
 	return isPinned(f.bitField())
 }
 
-// contacts returns the number of edges with pieces ignoring Above
-// as it's not necessary for any algorithms and makes checks
-// further on more complicated.
+// contacts returns the number of edges with pieces ignoring Above as it's not necessary for any algorithms and makes
+// checks further on more complicated.
 func (f Formation) contacts() (count int) {
 	for _, p := range f[:6] {
 		if p != ZeroPiece {
@@ -119,6 +126,7 @@ func (f Formation) above() Piece {
 	return f[Above]
 }
 
+// IsSuffocating returns true when the piece is in contact with 6 pieces. It excludes the above piece in the check.
 func (f Formation) IsSuffocating() bool {
 	return f.contacts() == 6
 }

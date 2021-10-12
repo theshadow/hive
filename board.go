@@ -4,10 +4,10 @@ import (
 	"fmt"
 )
 
-// TODO how do I marshall this type
 // Board represents a 4D hex grid (x, y, z, height). It works by storing
 // the contents of a hex coordinate ("cell") in a slice and using a map
 // to quickly reference the memory.
+// TODO how do I marshall this type
 type Board struct {
 	// used to quickly look up the piece in the cells
 	locationMap map[Coordinate]int
@@ -62,7 +62,7 @@ func (brd *Board) Place(p Piece, c Coordinate) error {
 	return nil
 }
 
-// Act will accept a source (A) coordinate and a destination (B) coordinate
+// Move will accept a source (A) coordinate and a destination (B) coordinate
 // and attempt to move the piece to that location. It will return an error
 // if a piece doesn't exist at the source or if a piece does exists at the
 // destination.
@@ -89,9 +89,9 @@ func (brd *Board) Cell(c Coordinate) (Piece, bool) {
 	return ZeroPiece, false
 }
 
-// Return an array with seven elements, each element represents one
+// Neighbors will return an array with seven elements, each element represents one
 // of the edges of the piece. We colloquially name these North, Northeast,
-// Southeast, South, Southwest, Northwest, and Above respectively. By default it
+// Southeast, South, Southwest, Northwest, and Above respectively. By default, it
 // is always assumed that the top flat edge is always considered North and
 // that the additional edges continue in a clockwise fashion around the piece.
 //
@@ -107,7 +107,6 @@ func (brd *Board) Cell(c Coordinate) (Piece, bool) {
 //
 // Will return an error when the supplied coordinate isn't a valid location
 func (brd *Board) Neighbors(c Coordinate) (formation [7]Piece, err error) {
-
 
 	for i, loc := range NeighborsMatrix {
 		loc = c.Add(loc)

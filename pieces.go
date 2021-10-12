@@ -2,8 +2,13 @@ package hived
 
 import "fmt"
 
+// Piece is a type that stores the attributes about a particular piece necessary for game rules. These attributes are
+// described as follows:
+//
 //   Color |  Bug   | Piece  | Unused
 // 11111111|11111111|11111111|11111111
+//
+// Where the Unused bit field is left unused by the system and has no defined behavior.
 type Piece uint32
 
 func NewPiece(color, bug, piece uint8) Piece {

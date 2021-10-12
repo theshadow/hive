@@ -75,6 +75,7 @@ func (c Coordinate) Add(loc Coordinate) Coordinate {
   These functions rely on bit-masking to mask the required bits out and then
   bit operations to isolate and convert from the uint32 type to an int8
 */
+
 func (c Coordinate) X() int8 {
 	if uint8(c>>24)&0b10000000 > 0 {
 		// shift to the bits, unset the high flag, cast, and add sign

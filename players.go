@@ -2,8 +2,9 @@ package hived
 
 import "fmt"
 
-// A Player tracks the color and remaining cells the player has.
-//     . Unused
+// Player type tracks the color and remaining pieces that a player has.
+//
+//    . Unused
 //    (C)olor
 //    (Q)ueen
 //    (A)nt         x 3
@@ -16,6 +17,7 @@ import "fmt"
 //
 //    .CQA|AAGG|GBBS|SMLP
 //    1111|1111|1111|1111
+//
 type Player uint16
 
 func NewPlayer() *Player {
@@ -35,7 +37,7 @@ func (p *Player) HasQueen() bool {
 	return (*p & QueenMask) != 0
 }
 
-// Will return 3 or less for the count as there are only three ants per player
+// Ants will return 3 or less for the count as there are only three ants per player
 func (p *Player) Ants() (count int) {
 	n := int((*p & AntsMask) >> 9)
 	for n > 0 {
@@ -45,7 +47,7 @@ func (p *Player) Ants() (count int) {
 	return count
 }
 
-// Will return 3 or less for the count as there are only three grasshoppers per player
+// Grasshoppers will return 3 or less for the count as there are only three grasshoppers per player
 func (p *Player) Grasshoppers() (count int) {
 	n := int((*p & GrasshoppersMask) >> 7)
 	for n > 0 {
@@ -55,7 +57,7 @@ func (p *Player) Grasshoppers() (count int) {
 	return count
 }
 
-// Will return 2 or less for the count as there are only two beetles per player
+// Beetles will return 2 or less for the count as there are only two beetles per player
 func (p *Player) Beetles() (count int) {
 	n := int((*p & BeetlesMask) >> 5)
 	for n > 0 {
@@ -65,7 +67,7 @@ func (p *Player) Beetles() (count int) {
 	return count
 }
 
-// Will return 2 or less for the count as there are only two spiders per player
+// Spiders will return 2 or less for the count as there are only two spiders per player
 func (p *Player) Spiders() (count int) {
 	n := int((*p & SpidersMask) >> 3)
 	for n > 0 {
@@ -85,12 +87,14 @@ func (p *Player) HasPillBug() bool {
 }
 
 // The Take* interface is the way you take a piece from a players inventory.
-//	As we're treating a player as a Location type it is immutable without mucking with memory.
-//	Instead we accept that player is a Location type and say that any modifications are made via
-//	returning a modified version of the Location.
+// As we're treating a player as a Location type it is immutable without mucking with memory.
+// Instead, we accept that player is a Location type and say that any modifications are made via
+// returning a modified version of the Location.
 
 // TODO double check the take-interface tests
-// TakeQueen
+
+// TakeQueen will attempt to take a Queen piece from the players inventory and will return an ErrNoPieceAvailable if
+// there aren't any pieces available.
 func (p *Player) TakeQueen() error {
 	if !p.HasQueen() {
 		return ErrNoPieceAvailable
@@ -99,7 +103,8 @@ func (p *Player) TakeQueen() error {
 	return nil
 }
 
-// TakeAnAnt
+// TakeAnAnt will attempt to take an Ant piece from the players inventory and will return an ErrNoPieceAvailable if
+// aren't any pieces available.
 func (p *Player) TakeAnAnt() error {
 	if p.Ants() == 3 {
 		*p &^= AntABitMask
@@ -115,7 +120,8 @@ func (p *Player) TakeAnAnt() error {
 	}
 }
 
-// TakeAGrasshopper
+// TakeAGrasshopper will attempt to take a Grasshopper piece from the players inventory and will return an
+// ErrNoPieceAvailable if aren't any pieces available.
 func (p *Player) TakeAGrasshopper() error {
 	if p.Grasshoppers() == 3 {
 		*p &^= GrasshopperAMask
@@ -131,7 +137,8 @@ func (p *Player) TakeAGrasshopper() error {
 	}
 }
 
-// TakeABeetle
+// TakeABeetle will attempt to take a Beetle piece from the players inventory and will return an
+// ErrNoPieceAvailable if aren't any pieces available.
 func (p *Player) TakeABeetle() error {
 	if p.Beetles() == 2 {
 		*p &^= BeetleAMask
@@ -144,7 +151,8 @@ func (p *Player) TakeABeetle() error {
 	}
 }
 
-// TakeASpider
+// TakeASpider will attempt to take a Spider piece from the players inventory and will return an
+// ErrNoPieceAvailable if aren't any pieces available.
 func (p *Player) TakeASpider() error {
 	if p.Spiders() == 2 {
 		*p &^= SpiderAMask
@@ -157,7 +165,8 @@ func (p *Player) TakeASpider() error {
 	}
 }
 
-// TakeMosquito
+// TakeMosquito will attempt to take a Mosquito piece from the players inventory and will return an
+// ErrNoPieceAvailable if aren't any pieces available.
 func (p *Player) TakeMosquito() error {
 	if !p.HasMosquito() {
 		return ErrNoPieceAvailable
@@ -166,7 +175,8 @@ func (p *Player) TakeMosquito() error {
 	return nil
 }
 
-// TakeLadyBug
+// TakeLadybug will attempt to take a Ladybug piece from the players inventory and will return an
+// ErrNoPieceAvailable if aren't any pieces available.
 func (p *Player) TakeLadybug() error {
 	if !p.HasLadybug() {
 		return ErrNoPieceAvailable
@@ -175,7 +185,8 @@ func (p *Player) TakeLadybug() error {
 	return nil
 }
 
-// TakePillBug
+// TakePillBug will attempt to take a PillBug piece from the players inventory and will return an
+// ErrNoPieceAvailable if aren't any pieces available.
 func (p *Player) TakePillBug() error {
 	if !p.HasPillBug() {
 		return ErrNoPieceAvailable
