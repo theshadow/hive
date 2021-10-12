@@ -1,4 +1,4 @@
-package hived
+package hive
 
 // Pretty much taken from the example in the documentation about heap.
 import (

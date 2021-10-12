@@ -3,7 +3,7 @@ package game
 import (
 	"math"
 
-	. "github.com/theshadow/hived"
+	. "github.com/theshadow/hive"
 )
 
 // Distance will return the Manhattan distance between two coordinates.

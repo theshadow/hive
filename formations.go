@@ -1,4 +1,4 @@
-package hived
+package hive
 
 // Formation types are used to track the neighbors around a piece. Specifically adds functionality for quickly
 // validating position of pieces around a center piece.

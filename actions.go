@@ -1,4 +1,4 @@
-package hived
+package hive
 
 import "fmt"
 

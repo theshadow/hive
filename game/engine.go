@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	. "github.com/theshadow/hived"
+	. "github.com/theshadow/hive"
 )
 
 // Game maintains the game instance state

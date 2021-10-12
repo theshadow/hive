@@ -1,4 +1,4 @@
-package hived
+package hive
 
 var (
 	// Version tracks the API

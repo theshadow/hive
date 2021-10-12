@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package hived is a tiny game engine of the Hive (c) board game that aims to be
+Package hive is a tiny game engine of the Hive (c) board game that aims to be
 rule compliant with the base game plus the Ladybug, Mosquito, and Pill Bug
 expansions. A typical use of this library is to implement either a client and/or
 server pair for hosting your own games.
@@ -31,4 +31,4 @@ All together, a Player may perform one action per turn and that act is recorded 
 A collection of Actions is stored in the state as the history.
 
 */
-package hived
+package hive

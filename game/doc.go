@@ -25,7 +25,7 @@ Types and Values
 
 The Game type should act as the primary interface for the library if you want to just
 provide a client or server wrapper around the the game. If you're looking to implement
-your own game the rest of the types within the hived package are at your disposal.
+your own game the rest of the types within the hive package are at your disposal.
 
 Errors
 

@@ -4,14 +4,14 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/theshadow/hived"
+	"github.com/theshadow/hive"
 )
 
 func TestGame_Place(t *testing.T) {
 	t.Log("When a player attempts to place a piece not on their turn an error is returned.")
 	g := New(nil)
-	p := hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
-	coord := hived.NewCoordinate(0, 0, 0, 0)
+	p := hive.NewPiece(hive.BlackColor, hive.Queen, hive.PieceA)
+	coord := hive.NewCoordinate(0, 0, 0, 0)
 	if err := g.Place(p, coord); err == nil {
 		t.Log("Attempted to place a black piece during the white players turn but didn't receive an error.")
 		t.Fail()
@@ -26,8 +26,8 @@ func TestGame_Place(t *testing.T) {
 
 	t.Log("When the first piece is not placed at origin an error is returned.")
 	g = New(nil)
-	p = hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
-	coord = hived.NewCoordinate(0, 0, 0, 1)
+	p = hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+	coord = hive.NewCoordinate(0, 0, 0, 1)
 	if err := g.Place(p, coord); err == nil {
 		t.Logf("Attempted to place the first piece at %s and did not receive an error.", coord)
 		t.Fail()
@@ -41,20 +41,20 @@ func TestGame_Place(t *testing.T) {
 	}
 
 	t.Log("When a player places a piece and they do not have that piece available an error is returned.")
-	wplayer := hived.NewPlayer()
+	wplayer := hive.NewPlayer()
 	_ = wplayer.TakeQueen()
 	g = &Game{
 		turns:           1,
-		turn:            hived.WhiteColor,
+		turn:            hive.WhiteColor,
 		white:           wplayer,
-		black:           hived.NewPlayer(),
-		board:           hived.NewBoard(),
-		history:         []hived.Action{},
-		paralyzedPieces: make(map[hived.Coordinate]int),
+		black:           hive.NewPlayer(),
+		board:           hive.NewBoard(),
+		history:         []hive.Action{},
+		paralyzedPieces: make(map[hive.Coordinate]int),
 		features:        featureMap,
 	}
-	wp := hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
-	if err := g.Place(wp, hived.NewCoordinate(0, 0, 0, 0)); err == nil {
+	wp := hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+	if err := g.Place(wp, hive.NewCoordinate(0, 0, 0, 0)); err == nil {
 		t.Logf("Attempted to place a '%s' piece that the player didn't have available and no error was returned.",
 			wp)
 		t.Fail()
@@ -63,16 +63,16 @@ func TestGame_Place(t *testing.T) {
 	t.Log("When a player places their piece on the fourth turn and the player hasn't placed their queen and the piece being placed isn't a queen an error is returned.")
 	g = &Game{
 		turns:           4,
-		turn:            hived.WhiteColor,
-		white:           hived.NewPlayer(),
-		black:           hived.NewPlayer(),
-		board:           hived.NewBoard(),
-		history:         []hived.Action{},
-		paralyzedPieces: make(map[hived.Coordinate]int),
+		turn:            hive.WhiteColor,
+		white:           hive.NewPlayer(),
+		black:           hive.NewPlayer(),
+		board:           hive.NewBoard(),
+		history:         []hive.Action{},
+		paralyzedPieces: make(map[hive.Coordinate]int),
 		features:        featureMap,
 	}
-	wp = hived.NewPiece(hived.WhiteColor, hived.Ant, hived.PieceA)
-	if err := g.Place(wp, hived.NewCoordinate(0, 0, 0, 0)); err == nil {
+	wp = hive.NewPiece(hive.WhiteColor, hive.Ant, hive.PieceA)
+	if err := g.Place(wp, hive.NewCoordinate(0, 0, 0, 0)); err == nil {
 		t.Logf("Attempted to place a %s piece on the fourth turn while not having placed a queen and didn't receive an error.",
 			wp)
 		t.Fail()
@@ -88,16 +88,16 @@ func TestGame_Place(t *testing.T) {
 	t.Log("When placing a piece above the surface and no pieces exist below an error is returned.")
 	g = &Game{
 		turns:           3,
-		turn:            hived.WhiteColor,
-		white:           hived.NewPlayer(),
-		black:           hived.NewPlayer(),
-		board:           hived.NewBoard(),
-		history:         []hived.Action{},
-		paralyzedPieces: make(map[hived.Coordinate]int),
+		turn:            hive.WhiteColor,
+		white:           hive.NewPlayer(),
+		black:           hive.NewPlayer(),
+		board:           hive.NewBoard(),
+		history:         []hive.Action{},
+		paralyzedPieces: make(map[hive.Coordinate]int),
 		features:        featureMap,
 	}
-	p = hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
-	coord = hived.NewCoordinate(0, 0, 0, 1)
+	p = hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+	coord = hive.NewCoordinate(0, 0, 0, 1)
 	if err := g.Place(p, coord); err == nil {
 		t.Logf("Attempted to place the first piece at %s and did not receive an error.", coord)
 		t.Fail()
@@ -112,8 +112,8 @@ func TestGame_Place(t *testing.T) {
 
 	t.Log("When placing a queen on the first turn while the tournaments feature flag is enabled an error is returned.")
 	g = New([]Feature{TournamentQueensRuleFeature})
-	p = hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
-	coord = hived.NewCoordinate(0, 0, 0, 0)
+	p = hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+	coord = hive.NewCoordinate(0, 0, 0, 0)
 	if err := g.Place(p, coord); err == nil {
 		t.Log("Attempted to place a queen on the first turn while the tournament rules were active and no error was returned.")
 		t.Fail()
@@ -131,22 +131,22 @@ func TestGame_Place(t *testing.T) {
 	t.Log("When placing a piece after the first turn, placing a piece touching an opponents piece returns an error.")
 	g = New(nil)
 
-	p = hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
-	coord = hived.NewCoordinate(0, 0, 0, 0)
+	p = hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+	coord = hive.NewCoordinate(0, 0, 0, 0)
 	if err := g.Place(p, coord); err != nil {
 		t.Logf("Unexpected error %#v while white was placing a piece", err)
 		t.Fail()
 	}
 
-	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
-	coord = hived.NewCoordinate(1, -1, 0, 0)
+	p = hive.NewPiece(hive.BlackColor, hive.Queen, hive.PieceA)
+	coord = hive.NewCoordinate(1, -1, 0, 0)
 	if err := g.Place(p, coord); err != nil {
 		t.Logf("Unexpected error %#v while black was placing a piece", err)
 		t.Fail()
 	}
 
-	p = hived.NewPiece(hived.WhiteColor, hived.Ant, hived.PieceA)
-	coord = hived.NewCoordinate(1, 0, -1, 0)
+	p = hive.NewPiece(hive.WhiteColor, hive.Ant, hive.PieceA)
+	coord = hive.NewCoordinate(1, 0, -1, 0)
 	if err := g.Place(p, coord); err == nil {
 		t.Log("Expected an error while white was placing a piece that is adjacent to a black piece after the first turn.")
 		t.Fail()
@@ -164,39 +164,39 @@ func TestGame_Move(t *testing.T) {
 	t.Log("When moving attempting to move a non-existing piece from an empty cell an error is returned.")
 	g := New(nil)
 
-	if err := g.Move(hived.Origin, hived.Origin); err == nil {
+	if err := g.Move(hive.Origin, hive.Origin); err == nil {
 		t.Log("Expected an error when attempting to move a piece that doesn't exist.")
 		t.Fail()
 	} else {
 		t.Log("When attempting to move a piece from an empty cell the expected error is returned.")
-		if !errors.Is(err, hived.ErrInvalidCoordinate) {
-			t.Logf("Expected an error of type %#v instead received %#v.", hived.ErrInvalidCoordinate, err)
+		if !errors.Is(err, hive.ErrInvalidCoordinate) {
+			t.Logf("Expected an error of type %#v instead received %#v.", hive.ErrInvalidCoordinate, err)
 			t.Fail()
 		}
 	}
 
 	t.Log("When attempting to move a piece and the destination coordinate is the same as the source an error is returned.")
 	g = New(nil)
-	p := hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
-	if err := g.Place(p, hived.Origin); err != nil {
+	p := hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+	if err := g.Place(p, hive.Origin); err != nil {
 		t.Logf("Unexpected error %#v while white was placing a piece", err)
 		t.Fail()
 	}
 
-	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
-	coord := hived.NewCoordinate(1, -1, 0, 0)
+	p = hive.NewPiece(hive.BlackColor, hive.Queen, hive.PieceA)
+	coord := hive.NewCoordinate(1, -1, 0, 0)
 	if err := g.Place(p, coord); err != nil {
 		t.Logf("Unexpected error %#v while black was placing a piece", err)
 		t.Fail()
 	}
 
-	if err := g.Move(hived.Origin, hived.Origin); err == nil {
+	if err := g.Move(hive.Origin, hive.Origin); err == nil {
 		t.Log("When attempting to move a piece from the origin to the origin an error was expected")
 		t.Fail()
 	} else {
 		t.Log("When attempting to move a piece from origin to the origin the expected error is returned.")
-		if !errors.Is(err, hived.ErrInvalidCoordinate) {
-			t.Logf("Expected an error of type %#v instead received %#v.", hived.ErrInvalidCoordinate, err)
+		if !errors.Is(err, hive.ErrInvalidCoordinate) {
+			t.Logf("Expected an error of type %#v instead received %#v.", hive.ErrInvalidCoordinate, err)
 			t.Fail()
 		}
 	}
@@ -204,20 +204,20 @@ func TestGame_Move(t *testing.T) {
 	t.Log("When attempting to move an opponents piece an error is returned.")
 	g = New(nil)
 
-	p = hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
-	if err := g.Place(p, hived.Origin); err != nil {
+	p = hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+	if err := g.Place(p, hive.Origin); err != nil {
 		t.Logf("Unexpected error %#v while white was placing a piece", err)
 		t.Fail()
 	}
 
-	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
-	coord = hived.NewCoordinate(1, -1, 0, 0)
+	p = hive.NewPiece(hive.BlackColor, hive.Queen, hive.PieceA)
+	coord = hive.NewCoordinate(1, -1, 0, 0)
 	if err := g.Place(p, coord); err != nil {
 		t.Logf("Unexpected error %#v while black was placing a piece", err)
 		t.Fail()
 	}
 
-	if err := g.Move(coord, hived.NewCoordinate(0, -1, 1, 0)); err == nil {
+	if err := g.Move(coord, hive.NewCoordinate(0, -1, 1, 0)); err == nil {
 		t.Log("Expected an error to be returned when white attempted to move one of blacks pieces.")
 		t.Fail()
 	} else {
@@ -231,20 +231,20 @@ func TestGame_Move(t *testing.T) {
 	t.Log("When attempting to move a piece without having placed their queen an error is returned.")
 	g = New(nil)
 
-	p = hived.NewPiece(hived.WhiteColor, hived.Ant, hived.PieceA)
-	if err := g.Place(p, hived.Origin); err != nil {
+	p = hive.NewPiece(hive.WhiteColor, hive.Ant, hive.PieceA)
+	if err := g.Place(p, hive.Origin); err != nil {
 		t.Logf("Unexpected error %#v while white was placing a piece", err)
 		t.Fail()
 	}
 
-	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
-	coord = hived.NewCoordinate(1, -1, 0, 0)
+	p = hive.NewPiece(hive.BlackColor, hive.Queen, hive.PieceA)
+	coord = hive.NewCoordinate(1, -1, 0, 0)
 	if err := g.Place(p, coord); err != nil {
 		t.Logf("Unexpected error %#v while black was placing a piece", err)
 		t.Fail()
 	}
 
-	if err := g.Move(hived.Origin, hived.NewCoordinate(0, -1, 1, 0)); err == nil {
+	if err := g.Move(hive.Origin, hive.NewCoordinate(0, -1, 1, 0)); err == nil {
 		t.Log("Expected an error to be returned when white attempted to move a piece without placing their queen.")
 		t.Fail()
 	} else {
@@ -268,15 +268,15 @@ func TestGame_History(t *testing.T) {
 	t.Log("When requesting a copy of the game instance history all expected actions are returned")
 	g := New(nil)
 
-	p := hived.NewPiece(hived.WhiteColor, hived.Queen, hived.PieceA)
-	coord := hived.NewCoordinate(0, 0, 0, 0)
+	p := hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+	coord := hive.NewCoordinate(0, 0, 0, 0)
 	if err := g.Place(p, coord); err != nil {
 		t.Logf("Unexpected error %#v while white was placing a piece", err)
 		t.Fail()
 	}
 
-	p = hived.NewPiece(hived.BlackColor, hived.Queen, hived.PieceA)
-	coord = hived.NewCoordinate(1, -1, 0, 0)
+	p = hive.NewPiece(hive.BlackColor, hive.Queen, hive.PieceA)
+	coord = hive.NewCoordinate(1, -1, 0, 0)
 	if err := g.Place(p, coord); err != nil {
 		t.Logf("Unexpected error %#v while black was placing a piece", err)
 		t.Fail()
