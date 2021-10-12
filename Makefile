@@ -2,7 +2,7 @@ all: static-analysis tests
 .PHONY: formatting static-analysis test
 
 tests:
-	go test -test.v ./...
+	go test -test.v ./... ./game
 
 static-analysis:
 	go vet ./...

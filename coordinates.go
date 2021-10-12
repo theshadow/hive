@@ -2,25 +2,18 @@ package hive
 
 import "fmt"
 
-// Coordinate represents a physical location on the board.
-// The board maintains a hex grid with a four dimensional
-// coordinate system. Three for the surface location and
-// one for the height above the board.
+// Coordinate canonical location on the board. The board maintains a hex grid with a four dimensional
+// coordinate system. The coordinate system is broken down into three values that represent the Cube coordinate and an
+// additional value to store the height.
 //
-// We accomplish this by splitting an uint32 into four
-// bytes and then encoding int8's into each of them.
-// This does make the code a little more arcane as you need
-// to know Go's bitwise operators and the type system rules
-// but it also means we don't need to pull in Bits or some
-// other lib to do the work for us. Which fits in with the
+// We accomplish this by splitting an uint32 into four bytes and then encoding int8's into each of them.
+// This does make the code a little more arcane as you need to know Go's bitwise operators and the type system rules
+// but it also means we don't need to pull in Bits or some other lib to do the work for us. Which fits in with the
 // project goal of being tiny.
 //
-// Using an int8 does put a practical limit on the size
-// of the world of -127 to 127 with a bit reserved for tracking
-// the sign. This shouldn't be an issue if we assume that
-// the world will wrap and if it does become an issue we
-// can maintain the interface and modify the type to
-// use an uint64 instead.
+// Using an int8 does put a practical limit on the size of the world of -127 to 127 with a bit reserved for tracking
+// the sign. This shouldn't be an issue if we assume that the world will wrap and if it does become an issue we
+// can maintain the interface and modify the type to use an uint64 instead.
 //
 //     X        Y        Z       H
 // 11111111|11111111|11111111|11111111

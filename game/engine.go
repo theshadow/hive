@@ -303,10 +303,9 @@ func (g *Game) Over() bool {
 
 // History will populate the supplied slice with a copy of the
 // actions performed for this game instance.
-func (g *Game) History() (history []Action) {
-	for _, e := range g.history {
-		history = append(history, e)
-	}
+func (g *Game) History() []Action {
+	history := make([]Action, len(g.history))
+	copy(history, g.history)
 	return history
 }
 
