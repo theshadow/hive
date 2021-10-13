@@ -11,8 +11,7 @@ func TestPiece_Set(t *testing.T) {
 	var pActual = NewPiece(WhiteColor, Beetle, PieceC)
 
 	if pExpected != pActual {
-		t.Logf("the expected piece %s did not match the actual piece %s", pExpected, pActual)
-		t.Fail()
+		t.Errorf("the expected piece %s did not match the actual piece %s", pExpected, pActual)
 	}
 }
 
@@ -22,13 +21,11 @@ func TestPiece_Color(t *testing.T) {
 	t.Logf("Cell - %s", p)
 
 	if p.Color() != BlackColor {
-		t.Log("Color didn't return black")
-		t.Fail()
+		t.Error("Color didn't return black")
 	}
 
 	if !p.IsBlack() {
-		t.Log("IsBlack didn't return true")
-		t.Fail()
+		t.Error("IsBlack didn't return true")
 	}
 
 	p = Piece(uint32(WhiteColor) << 24)
@@ -36,13 +33,11 @@ func TestPiece_Color(t *testing.T) {
 	t.Logf("Cell - %s", p)
 
 	if p.Color() != WhiteColor {
-		t.Log("Color didn't return white")
-		t.Fail()
+		t.Error("Color didn't return white")
 	}
 
 	if !p.IsWhite() {
-		t.Log("IsWhite didn't return true")
-		t.Fail()
+		t.Error("IsWhite didn't return true")
 	}
 }
 
@@ -52,8 +47,7 @@ func TestPiece_ColorS(t *testing.T) {
 	t.Logf("Cell - %s", p)
 
 	if p.ColorS() != colorLabels[BlackColor] {
-		t.Log("ColorS didn't return black")
-		t.Fail()
+		t.Error("ColorS didn't return black")
 	}
 
 	p = Piece(uint32(WhiteColor) << 24)
@@ -61,7 +55,7 @@ func TestPiece_ColorS(t *testing.T) {
 	t.Logf("Cell - %s", p)
 
 	if p.ColorS() != colorLabels[WhiteColor] {
-		t.Log("ColorS didn't return white")
+		t.Error("ColorS didn't return white")
 		t.Fail()
 	}
 }
@@ -74,11 +68,10 @@ func TestPiece_Bug(t *testing.T) {
 		t.Logf("Cell - %s", p)
 
 		if p.Bug() != i {
-			t.Logf("Bug didn't return %d", i)
-			t.Fail()
+			t.Errorf("Bug didn't return %d", i)
 		}
 		if p.BugS() != bugLabels[i] {
-			t.Logf("BugS didn't return %s", bugLabels[i])
+			t.Errorf("BugS didn't return %s", bugLabels[i])
 		}
 	}
 }
@@ -91,12 +84,10 @@ func TestPiece_Piece(t *testing.T) {
 		t.Logf("Cell - %s", p)
 
 		if int(p.Piece()) != i {
-			t.Logf("Cell didn't return %d", i)
-			t.Fail()
+			t.Errorf("Cell didn't return %d", i)
 		}
 		if p.PieceS() != pieceLabels[i] {
-			t.Logf("Cell didn't return %s, returned %s", pieceLabels[i], p.PieceS())
-			t.Fail()
+			t.Errorf("Cell didn't return %s, returned %s", pieceLabels[i], p.PieceS())
 		}
 	}
 }

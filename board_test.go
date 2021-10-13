@@ -18,26 +18,21 @@ func TestBoard_Place(t *testing.T) {
 	_ = board.Place(pieceC, cPieceC)
 
 	if p, ok := board.Cell(cPieceA); !ok || p != pieceA {
-		t.Logf("Cell didn't return expected piece")
-		t.Fail()
+		t.Error("Cell didn't return expected piece")
 	}
 	if p, ok := board.Cell(cPieceA); !ok || p != pieceA {
-		t.Logf("Cell didn't return expected piece")
-		t.Fail()
+		t.Error("Cell didn't return expected piece")
 	}
 	if p, ok := board.Cell(cPieceA); !ok || p != pieceA {
-		t.Logf("Cell didn't return expected piece")
-		t.Fail()
+		t.Error("Cell didn't return expected piece")
 	}
 
 	if _, ok := board.Cell(NewCoordinate(100, 100, 100, 0)); ok {
-		t.Logf("Cell returned an unexpected piece")
-		t.Fail()
+		t.Error("Cell returned an unexpected piece")
 	}
 
 	if err := board.Place(pieceC, cPieceC); err == nil {
-		t.Logf("expected place to return an ErrPauliExclusionPrinciple when trying to place a piece in a cell where a piece exists")
-		t.Fail()
+		t.Error("expected place to return an ErrPauliExclusionPrinciple when trying to place a piece in a cell where a piece exists")
 	}
 }
 
@@ -50,26 +45,22 @@ func TestBoard_Move(t *testing.T) {
 
 	_ = board.Place(p, cA)
 	if err := board.Move(cA, cB); err != nil {
-		t.Logf("couldn't move piece on the board")
-		t.Fail()
+		t.Error("couldn't move piece on the board")
 	}
 
 	if _, ok := board.Cell(cA); ok {
-		t.Logf("found a piece at the source coordinate")
-		t.Fail()
+		t.Error("found a piece at the source coordinate")
 	}
 
 	if _, ok := board.Cell(cB); !ok {
-		t.Logf("found no piece at the destination coordinate")
-		t.Fail()
+		t.Error("found no piece at the destination coordinate")
 	}
 
 	p = NewPiece(WhiteColor, Ant, PieceA)
 	cA = NewCoordinate(0, 0, 0, 0)
 	_ = board.Place(p, cA)
 	if err := board.Move(cA, cB); err == nil {
-		t.Logf("expected an ErrPauliExclusionPrinciple when trying to move a piece to a cell with a piece")
-		t.Fail()
+		t.Error("expected an ErrPauliExclusionPrinciple when trying to move a piece to a cell with a piece")
 	}
 }
 
@@ -106,21 +97,18 @@ func TestBoard_Neighbors(t *testing.T) {
 		coord := origin.Add(NeighborsMatrix[idx])
 		err := board.Place(op, coord)
 		if err != nil {
-			t.Logf("failed to place origin: %s location: %s error: %s", origin, coord, err)
-			t.Fail()
+			t.Errorf("failed to place origin: %s location: %s error: %s", origin, coord, err)
 			break
 		}
 	}
 
 	// grab the neighbors and compare
 	if neighbors, err := board.Neighbors(origin); err != nil {
-		t.Log("unable to retrieve neighbors from origin")
-		t.Fail()
+		t.Error("unable to retrieve neighbors from origin")
 	} else {
 		for i, neighbor := range neighbors {
 			if otherPieces[i] != neighbor {
-				t.Logf("expected piece %s at %d, found %s", otherPieces[i], i, neighbor)
-				t.Fail()
+				t.Errorf("expected piece %s at %d, found %s", otherPieces[i], i, neighbor)
 			}
 		}
 	}

@@ -121,7 +121,7 @@ func TestGame_Place(t *testing.T) {
 		}
 	})
 
-	t.Run("When placing a piece after the first turn, placing a piece touching an opponents piece returns an error", func(t *testing.T) {
+	t.Run("When placing a piece after the first turn placing a piece touching an opponents piece returns an error", func(t *testing.T) {
 		g := New(nil)
 
 		p := hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
@@ -178,6 +178,7 @@ func TestGame_Move(t *testing.T) {
 			t.Errorf("Unexpected error %#v while black was placing a piece", err)
 		}
 
+		// TODO this should be a different coordinate as the test above performs this exact same check
 		if err := g.Move(hive.Origin, hive.Origin); err == nil {
 			t.Error("When attempting to move a piece from the origin to the origin an error was expected")
 		} else {
@@ -202,6 +203,7 @@ func TestGame_Move(t *testing.T) {
 			t.Errorf("Unexpected error %#v while black was placing a piece", err)
 		}
 
+		// it is whites turn, attempt to move blacks piece
 		if err := g.Move(coord, hive.NewCoordinate(0, -1, 1, 0)); err == nil {
 			t.Error("Expected an error to be returned when white attempted to move one of blacks pieces")
 		} else {
@@ -236,11 +238,30 @@ func TestGame_Move(t *testing.T) {
 		}
 	})
 
-	// TODO When attempting to move a piece that is pinned an error is returned
-	// TODO When attempting to move a piece that is paralyzed an error is returned
-	// TODO When attempting to move a piece that would split the hive an error is returned
-	// TODO When attempting to move a piece not following the piece's pathing rules an error is returned
+	// TODO When attempting to move a piece and it doesn't touch another piece an error is returned
+	t.Run("When attempting to move a piece and it doesn't touch another piece an error is returned", func(t *testing.T) {
+		t.Skip("Not yet implemented")
+	})
 
+	// TODO When attempting to move a piece that is pinned an error is returned
+	t.Run("When attempting to move a piece that is pinned an error is returned", func(t *testing.T) {
+		t.Skip("Not yet implemented")
+	})
+
+	// TODO When attempting to move a piece that is paralyzed an error is returned
+	t.Run("When attempting to move a piece that is paralyzed an error is returned", func(t *testing.T) {
+		t.Skip("Not yet implemented")
+	})
+
+	// TODO When attempting to move a piece that would split the hive an error is returned
+	t.Run("When attempting to move a piece that would split the hive an error is returned", func(t *testing.T) {
+		t.Skip("Not yet implemented")
+	})
+
+	// TODO When attempting to move a piece not following the piece's pathing rules an error is returned
+	t.Run("When attempting to move a piece not following the pieces pathing rules an error is returned", func(t *testing.T) {
+		t.Skip("Not yet implemented")
+	})
 }
 
 func TestGame_History(t *testing.T) {

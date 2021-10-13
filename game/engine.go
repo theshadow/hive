@@ -200,6 +200,8 @@ func (g *Game) Move(a, b Coordinate) error {
 	// TODO: implement splitting hive on move
 	// If it can slide, and there are four neighbors there is no split.
 
+	// TODO make sure that the move doesn't split the hive, the piece must touch at least one other piece
+
 	// TODO: implement path validation
 	// Is this move valid?
 	//     - Can this piece move to this location (pathing)

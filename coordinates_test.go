@@ -22,8 +22,7 @@ func TestCoordinate(t *testing.T) {
 		t.Logf("Test[%d] Expected: %d (%32b)", i+1, test.expected, test.expected)
 
 		if test.actual != Coordinate(test.expected) {
-			t.Logf("actual coordinate did not match the expected coordinate")
-			t.Fail()
+			t.Error("actual coordinate did not match the expected coordinate")
 		}
 	}
 
@@ -44,20 +43,16 @@ func TestCoordinate_Parts(t *testing.T) {
 		t.Logf("Coordinate: %d (%32b), X: %d, Y: %d, Z: %d, H: %d", c, c, test.x, test.y, test.z, test.h)
 
 		if c.X() != test.x {
-			t.Logf("expected X to return %d instead returned %d (%8b)", test.x, c.X(), c.X())
-			t.Fail()
+			t.Errorf("expected X to return %d instead returned %d (%8b)", test.x, c.X(), c.X())
 		}
 		if c.Y() != test.y {
-			t.Logf("expected Y to return %d instead returned %d (%8b)", test.y, c.Y(), c.Y())
-			t.Fail()
+			t.Errorf("expected Y to return %d instead returned %d (%8b)", test.y, c.Y(), c.Y())
 		}
 		if c.Z() != test.z {
-			t.Logf("expected Z to return %d instead returned %d (%8b)", test.z, c.Z(), c.Z())
-			t.Fail()
+			t.Errorf("expected Z to return %d instead returned %d (%8b)", test.z, c.Z(), c.Z())
 		}
 		if c.H() != test.h {
 			t.Logf("expected H to return %d instead returned %d (%8b)", test.h, c.H(), c.H())
-			t.Fail()
 		}
 	}
 }
