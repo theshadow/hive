@@ -1,5 +1,8 @@
 all: static-analysis tests
-.PHONY: formatting static-analysis test
+.PHONY: formatting static-analysis test coverage-report
+
+coverage-report:
+	go test -race -covermode=atomic -coverprofile=coverage.out
 
 tests:
 	go test -test.v ./... ./game

@@ -56,9 +56,9 @@ package hive
 //
 // True to matrix math we can quickly identify that in each column all of the permutations contain reflections. That
 // is, "101010" is the mirror image of "010101". We may be able to use this information during our checks to reduce
-// the number of operations if we can find a cheap way to create the reflection of an integer Location. If we can't I believe
-// we can simply create a map[int]int where the key is the decimal Location of the bitfield and the mapped to integer is
-// the type of formation, be it Chevron, Butterfly, or Spaceship.
+// the number of operations if we can find a cheap way to create the reflection of an integer Location. If we can't, I
+// believe we can simply create a map[int]int where the key is the decimal Location of the bitfield and the mapped to
+// integer is the type of formation, be it Chevron, Butterfly, or Spaceship.
 //
 type Formation [7]Piece
 
@@ -135,10 +135,28 @@ func (f Formation) IsSuffocating() bool {
 // the formationMap and if the formation exists
 // return true, otherwise return false.
 func isPinned(formation int) bool {
-	if _, ok := formationMap[formation]; !ok {
-		return false
+	// We do up to three rotates of the lower 6 bits, if any of those rotations match a formation then we will return
+	// true
+	for i := 0; i < 3; i++ {
+		if _, ok := formationMap[formation]; ok {
+			return true
+		}
+		formation = int(RotateRight8Lower6(uint8(formation)))
 	}
-	return true
+	return false
+}
+
+// RotateRight8Lower6 returns the value x rotated to the right one time and only rotates the lower six bits
+func RotateRight8Lower6(x uint8) (n uint8) {
+	n = x >> 1
+
+	// if the shifted bit is set make sure the 6th bit is set otherwise the zero will be shifted into the number when
+	// we performed the right shift.
+	if x&1 > 0 {
+		n |= 1 << 5
+	}
+
+	return n
 }
 
 // Internal map used to detect specific formations.

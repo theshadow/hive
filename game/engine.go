@@ -127,7 +127,7 @@ func (g *Game) Place(p Piece, c Coordinate) error {
 	// Validate that every piece placed after the first turn is not in contact with an opponents piece.
 	if g.turns != FirstTurn {
 		// we must allow the players to place pieces that touch each other on the first turn, but never again.
-		if neighbors, _ := g.board.Neighbors(c); contactWithOpponentsPiece(p, neighbors) {
+		if neighbors := g.board.Neighbors(c); contactWithOpponentsPiece(p, neighbors) {
 			return ErrRuleMayNotPlaceTouchingOpponentsPiece
 		}
 	}
@@ -181,15 +181,10 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrRuleMustPlaceQueenToMove
 	}
 
-	// Is this piece allowed to move?
-	//     - Rule of sliding
-	//     - Paralyzed after Pill Bug action
-	//     - Breaking the hive
-	//     no: ErrRulePieceParalyzed
 	// If the formation of the neighbors is pinning the piece at the specified coordinate
 	// then it may not move.
-	if neighbors, _ := g.board.Neighbors(a); Formation(neighbors).IsPinned() {
-		return ErrRulePieceParalyzed
+	if neighbors := g.board.Neighbors(a); Formation(neighbors).IsPinned() {
+		return ErrRulePiecePinned
 	}
 
 	// if the piece is paralyzed the player can't move it
@@ -197,8 +192,10 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrRulePieceParalyzed
 	}
 
-	// TODO: implement splitting hive on move
+	// TODO: implement the check for splitting the hive
 	// If it can slide, and there are four neighbors there is no split.
+	// After some thought I'm wondering if I can use the pathing algorithm to look for a split in the hive.
+	// I would use the moving piece as the origin and assign a weighted value to each other piece such that the
 
 	// TODO make sure that the move doesn't split the hive, the piece must touch at least one other piece
 
@@ -266,28 +263,13 @@ func (g *Game) Over() bool {
 
 	// have they placed their queen?
 	if g.black.HasQueen() == false {
-		// I'm ignoring this error for a reason of long winded logic
-		//
-		// tl;dr — It should be impossible to reach this point and have a false victory.
-		//
-		// The only way Neighbors() can return an error is if the supplied coordinate
-		// is invalid. Based on the game rules the first piece will be placed at the
-		// origin so it would be impossible to reach this conditional while the player
-		// also has a queen to place.
-		//
-		// Further, the only time where there may be a false victory is IF the
-		// queen had a coordinate at the origin in the game state but the board
-		// had a piece at origin that was not a queen. In that state, we would
-		// have a false victory. However, we can't reach here without a queen being placed,
-		// and the only way for a queen to have an origin coordinate is if the player
-		// places or moves their queen to the origin coordinate.
-		neighbors, _ := g.board.Neighbors(g.blackQueen)
+		neighbors := g.board.Neighbors(g.blackQueen)
 		formation := Formation(neighbors)
 		blackSuffocating = formation.IsSuffocating()
 	}
 
 	if g.white.HasQueen() == false {
-		neighbors, _ := g.board.Neighbors(g.whiteQueen)
+		neighbors := g.board.Neighbors(g.whiteQueen)
 		formation := Formation(neighbors)
 		whiteSuffocating = formation.IsSuffocating()
 	}
@@ -510,7 +492,7 @@ func (g *Game) pieceProfile(p Piece, c Coordinate) profile {
 	if p.IsMosquito() {
 		// neighbors only returns an error with an invalid coordinate,
 		// by this point we should definitely have a valid coordinate.
-		neighbors, _ := g.board.Neighbors(c)
+		neighbors := g.board.Neighbors(c)
 		for _, piece := range neighbors {
 			if piece.IsLadybug() || piece.IsBeetle() {
 				climber &= Climber

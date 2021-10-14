@@ -106,7 +106,7 @@ func (brd *Board) Cell(c Coordinate) (Piece, bool) {
 // }
 //
 // Will return an error when the supplied coordinate isn't a valid location
-func (brd *Board) Neighbors(c Coordinate) (formation [7]Piece, err error) {
+func (brd *Board) Neighbors(c Coordinate) (formation [7]Piece) {
 
 	for i, loc := range NeighborsMatrix {
 		loc = c.Add(loc)
@@ -117,7 +117,7 @@ func (brd *Board) Neighbors(c Coordinate) (formation [7]Piece, err error) {
 		}
 	}
 
-	return formation, nil
+	return formation
 }
 
 func (brd *Board) Pieces() []cell {

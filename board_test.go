@@ -103,13 +103,10 @@ func TestBoard_Neighbors(t *testing.T) {
 	}
 
 	// grab the neighbors and compare
-	if neighbors, err := board.Neighbors(origin); err != nil {
-		t.Error("unable to retrieve neighbors from origin")
-	} else {
-		for i, neighbor := range neighbors {
-			if otherPieces[i] != neighbor {
-				t.Errorf("expected piece %s at %d, found %s", otherPieces[i], i, neighbor)
-			}
+	neighbors := board.Neighbors(origin)
+	for i, neighbor := range neighbors {
+		if otherPieces[i] != neighbor {
+			t.Errorf("expected piece %s at %d, found %s", otherPieces[i], i, neighbor)
 		}
 	}
 }
