@@ -7,7 +7,8 @@ import (
 // Board represents a 4D hex grid (x, y, z, height). It works by storing
 // the contents of a hex coordinate ("cell") in a slice and using a map
 // to quickly reference the memory.
-// TODO how do I marshall this type
+// TODO Consider binary marshalling vs json marshalling
+// TODO just use a json, consider storing in pgsql or noSQL solution
 type Board struct {
 	// used to quickly look up the piece in the cells
 	locationMap map[Coordinate]int
@@ -28,9 +29,9 @@ func NewBoard() *Board {
 // Should the board know about the game rules?
 //
 // With this definition the board will return an error if there is already a piece at
-// the specified coordinate. This is due to the fact that I'm accepting a trade off.
+// the specified coordinate. This is due to the fact that I'm accepting a tradeoff.
 // While there is merit and value in creating a more robust board that can manage
-// multiple pieces at a given location we will loose a valuable and in my opinion
+// multiple pieces at a given location we will lose a valuable and in my opinion
 // cheap safety net that will help us validate game rules. Details about the
 // two arguments are outlined below.
 //
@@ -62,9 +63,8 @@ func (brd *Board) Place(p Piece, c Coordinate) error {
 	return nil
 }
 
-// Move will accept a source (A) coordinate and a destination (B) coordinate
-// and attempt to move the piece to that location. It will return an error
-// if a piece doesn't exist at the source or if a piece does exists at the
+// Move will accept a source (A) coordinate and a destination (B) coordinate and attempt to move the piece to that
+// location. It will return an error if a piece doesn't exist at the source or if a piece does exist at the
 // destination.
 func (brd *Board) Move(a, b Coordinate) error {
 	if idx, ok := brd.locationMap[a]; ok {
@@ -149,7 +149,6 @@ var NeighborsMatrix = []Coordinate{
 
 // Represents a single cell of the hex grid. It's an internal type and shouldn't
 // be used elsewhere beyond the Board type
-// TODO move to internal
 type cell struct {
 	Piece      Piece
 	Coordinate Coordinate

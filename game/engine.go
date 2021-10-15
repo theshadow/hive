@@ -197,8 +197,6 @@ func (g *Game) Move(a, b Coordinate) error {
 	// After some thought I'm wondering if I can use the pathing algorithm to look for a split in the hive.
 	// I would use the moving piece as the origin and assign a weighted value to each other piece such that the
 
-	// TODO make sure that the move doesn't split the hive, the piece must touch at least one other piece
-
 	// TODO: implement path validation
 	// Is this move valid?
 	//     - Can this piece move to this location (pathing)
@@ -419,7 +417,7 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 	// ignoring the distance and cost checks.
 	// We do this here as if the distance is too great we don't
 	// want to spend time on a pricey a* lookup.
-	// TODO should I group all of the distance checks together. Determine if order is important for this check.
+	// TODO should I group all of the distance checks together? Determine if order is important for this check.
 	if bug := g.pieceProfile(p, a); bug.IsClimber() {
 		if p.IsBeetle() && dist > beetleMaxDistance {
 			return ErrRuleMovementDistanceTooGreat
@@ -430,10 +428,9 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 
 	// TODO: if piece is jumper (Grasshopper) calculate pathing for a straight line
 	// TODO: pill bug pathing??? path MUST route through pill bug?
-	//        1. A must be touching a pill bug of the current players color
-	//        2. The adjoining pill bug and the piece at A MUST NOT be paralyzed
-	//        3. B must be a valid empty cell that is also touching the same pill bug
-	// TODO: How does the rule of sliding work here?
+	//     1. A must be touching a pill bug of the current players color
+	//     2. The adjoining pill bug and the piece at A MUST NOT be paralyzed
+	//     3. B must be a valid empty cell that is also touching the same pill bug
 
 	frontier := make(PriorityQueue, 127)
 	costs := map[Coordinate]int{a: 0}

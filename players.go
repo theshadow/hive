@@ -91,8 +91,6 @@ func (p *Player) HasPillBug() bool {
 // Instead, we accept that player is a Location type and say that any modifications are made via
 // returning a modified version of the Location.
 
-// TODO double check the take-interface tests
-
 // TakeQueen will attempt to take a Queen piece from the players inventory and will return an ErrNoPieceAvailable if
 // there aren't any pieces available.
 func (p *Player) TakeQueen() error {
