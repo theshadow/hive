@@ -173,7 +173,7 @@ func TestGame_Move(t *testing.T) {
 		}
 
 		p = hive.NewPiece(hive.BlackColor, hive.Queen, hive.PieceA)
-		coord := hive.NewCoordinate(1, -1, 0, 0)
+		coord := hive.NewCoordinate(1, 0, -1, 0)
 		if err := g.Place(p, coord); err != nil {
 			t.Errorf("Unexpected error %#v while black was placing a piece", err)
 		}
@@ -245,7 +245,43 @@ func TestGame_Move(t *testing.T) {
 
 	// TODO When attempting to move a piece that is pinned an error is returned
 	t.Run("When attempting to move a piece that is pinned an error is returned", func(t *testing.T) {
-		t.Skip("Not yet implemented")
+		g := New(nil)
+
+		p := hive.NewPiece(hive.WhiteColor, hive.Queen, hive.PieceA)
+		if err := g.Place(p, hive.Origin); err != nil {
+			t.Errorf("Unexpected error %#v while white was placing a piece", err)
+		}
+
+		p = hive.NewPiece(hive.BlackColor, hive.Queen, hive.PieceA)
+		coord := hive.NewCoordinate(1, -1, 0, 0)
+		if err := g.Place(p, coord); err != nil {
+			t.Errorf("Unexpected error %#v while black was placing a piece", err)
+		}
+
+		p = hive.NewPiece(hive.WhiteColor, hive.Beetle, hive.PieceA)
+		if err := g.Place(p, hive.NewCoordinate(-1, 0, 1, 0)); err != nil {
+			t.Errorf("Unexpected error %#v while white was placing a piece", err)
+		}
+
+		p = hive.NewPiece(hive.BlackColor, hive.Ant, hive.PieceA)
+		coord = hive.NewCoordinate(1, -2, -1, 0)
+		if err := g.Place(p, coord); err != nil {
+			t.Errorf("Unexpected error %#v while black was placing a piece", err)
+		}
+
+		if err := g.Move(hive.NewCoordinate(-1, 0, 1, 0), hive.NewCoordinate(0, 0, 0, 1)); err != nil {
+			t.Errorf("Unexpected error while moving piece: %s", err)
+		}
+
+		p = hive.NewPiece(hive.BlackColor, hive.Ant, hive.PieceB)
+		coord = hive.NewCoordinate(2, -3, 1, 0)
+		if err := g.Place(p, coord); err != nil {
+			t.Errorf("Unexpected error while placing piece %s", err)
+		}
+
+		if err := g.Move(hive.Origin, hive.NewCoordinate(0, 1, -1, 0)); err == nil && !errors.Is(err, ErrRulePiecePinned) {
+			t.Errorf("Unexpected error while attempting to move a pinned piece: %s", err)
+		}
 	})
 
 	// TODO When attempting to move a piece that is paralyzed an error is returned

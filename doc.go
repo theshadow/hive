@@ -29,6 +29,5 @@ Game maintains the state of an instance of the game engine and is where the rule
 Board functions as the surface where a Piece is placed which is tracked with the Coordinate.
 All together, a Player may perform one action per turn and that act is recorded as an Action.
 A collection of Actions is stored in the state as the history.
-
 */
 package hive

@@ -176,7 +176,7 @@ func (g *Game) Move(a, b Coordinate) error {
 		return ErrRuleNotPlayersTurn
 	}
 
-	// If the player hasn't placed their queen they cannot move a piece
+	// If the player hasn't placed their queen they cannot   a piece
 	if player.HasQueen() {
 		return ErrRuleMustPlaceQueenToMove
 	}
@@ -219,6 +219,7 @@ func (g *Game) Move(a, b Coordinate) error {
 	if piece.IsQueen() {
 		g.updatePlayerQueen(b)
 	}
+
 	g.toggleTurn()
 
 	return nil
@@ -410,6 +411,7 @@ func (g *Game) featureEnabled(f Feature) bool {
 // TODO: Potentially return the path as []Coordinate for rendering engines this would
 //   require making this an exported function receiver.
 func (g *Game) path(a, b Coordinate, p Piece) error {
+	// TODO this looks like it's off by one.
 	dist := distance(a, b)
 
 	// is the distance to great for this piece? As beetles and ladybugs
@@ -437,7 +439,11 @@ func (g *Game) path(a, b Coordinate, p Piece) error {
 	from := map[Coordinate]Coordinate{a: Origin}
 
 	for frontier.Len() > 0 {
-		current := frontier.Pop().(Coordinate)
+		item := frontier.Pop()
+		if item == nil {
+			break
+		}
+		current := item.(Coordinate)
 		if current == b {
 			break
 		}

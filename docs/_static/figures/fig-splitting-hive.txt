@@ -146,3 +146,42 @@ Fig. Broken Butterfly (bitwise annotation: 10110000)
    /       \_____/       \_____/       \_____/       \
    \       /     \       /     \       /     \       /
     \_____/       \_____/       \_____/       \_____/
+
+Closed Harbors, are formations where the player may not slide a piece through the open port.
+
+1. Take a projection of the board state and then drop the moving piece from the board.
+2. Attempt to path from any connected piece on the board (as a starting point (origin)) and path to all other pieces connected.
+    - If the number of pieces visited is not-equal to the total number of pieces on the board then there is a split in the hive.
+    - Else there isn't.
+
+         _____         _____         _____
+        /     \       /     \       /     \
+  _____/       \_____/       \_____/       \_____
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/       \_____/       \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/   X   \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/   X   \_____/   X   \_____/       \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/   X   \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/   X   \_____/   O   \_____/       \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/   X   \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/       \_____/       \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/       \_____/       \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/       \_____/       \_____/
+ /     \       /     \       /     \       /     \
+/       \_____/       \_____/       \_____/       \
+\       /     \       /     \       /     \       /
+ \_____/       \_____/       \_____/       \_____/
